@@ -12,6 +12,9 @@ double blackScholesModel::calculateD1(double underlyingPrice, double strikePrice
     double denominator = volatility * sqrt(timeToExperation);
     
     double d1 = numerator / denominator;
+
+    setD1(d1);
+    return d1;
 }
 
 double blackScholesModel::calculateD2(double underlyingPrice, double strikePrice, double timeToExperication, double riskFreeRate, double volatility) const
@@ -78,3 +81,40 @@ void blackScholesModel::setUnderlyingPrice(const double& value)
     underlyingPrice = value;
 }
 
+
+void blackScholesModel::setUnderlyingPrice(const double& value) { underlyingPrice = value; }
+
+void blackScholesModel::setStrikePrice(const double& value) { strikePrice = value; }
+
+void blackScholesModel::setTimeToExperation(const double& value) { timeToExperation = value; }
+
+void blackScholesModel::setRiskFreeRate(const double& value) { riskFreeRate = value; }
+
+void blackScholesModel::setVolatility(const double& value) { volatility = value; }
+
+void blackScholesModel::setOptionType(const OptionType& option) { optionType = option; }
+
+void blackScholesModel::setD1(const double& value) const { _d1 = value; }
+
+void blackScholesModel::setD2(const double& value) const { _d2 = value; }
+
+void blackScholesModel::setK(const double& value) const { _K = value; }
+
+
+const double& blackScholesModel::getUnderlyingPrice() const { return underlyingPrice; }
+
+const double& blackScholesModel::getStrikePrice() const { return strikePrice; }
+
+const double& blackScholesModel::getTimeToExperation() const { return timeToExperation; }
+
+const double& blackScholesModel::getRiskFreeRate() const { return riskFreeRate; }
+
+const double& blackScholesModel::getVolatility() const { return volatility; }
+
+const blackScholesModel::OptionType blackScholesModel::getOptionType() const { return optionType; }
+
+const double& blackScholesModel::getD1() const { return _d1; }
+
+const double& blackScholesModel::getD2() const { return _d2; }
+
+const double& blackScholesModel::getK() const { return _K; }

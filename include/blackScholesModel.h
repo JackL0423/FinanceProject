@@ -51,6 +51,7 @@ class blackScholesModel
 
     double normalCDF(double d) const;
 
+
     void setUnderlyingPrice(const double& value);
 
     void setStrikePrice(const double& value);
@@ -63,9 +64,30 @@ class blackScholesModel
 
     void setOptionType(const OptionType& option);
 
-    void setD1(const double& value);
+    void setD1(const double& value) const;
+
+    void setD2(const double& value) const;
+
+    void setK(const double& value) const;
 
 
+    const double& getUnderlyingPrice() const;
+
+    const double& getStrikePrice() const;
+
+    const double& getTimeToExperation() const;
+
+    const double& getRiskFreeRate() const;
+
+    const double& getVolatility() const;
+
+    const OptionType getOptionType() const;
+
+    const double& getD1() const;
+
+    const double& getD2() const;
+
+    const double& getK() const;
 };  //  BlackScholesModel Class 
 
 #endif  //  BLACKSCHOLESMODEL_H 
