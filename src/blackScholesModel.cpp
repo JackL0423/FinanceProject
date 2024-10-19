@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cmath>
+#include <numbers>
 #include "../include/blackScholesModel.h"
 
 #undef DEBUG
@@ -17,17 +18,21 @@ double blackScholesModel::calculateD1(double underlyingPrice, double strikePrice
     return d1;
 }
 
-double blackScholesModel::calculateD2(double underlyingPrice, double strikePrice, double timeToExperication, double riskFreeRate, double volatility) const
+double blackScholesModel::calculateD2(double underlyingPrice, double strikePrice, double timeToExperation, double riskFreeRate, double volatility) const
 {
-    cout << "Returns the d2 variable for scholes mode\n";
-    return -9887.1;
+    double d2 = calculateD1(underlyingPrice, strikePrice, timeToExperation, riskFreeRate, volatility) - volatility * sqrt(timeToExperation);
+
+    setD2(d2);
+    return d2;
 }
 
 
 double blackScholesModel::calculateK(double d) const
 {
-    cout << "Formula for this function needs to be double checked.\n";
-    return d * (_d1 / _d2);
+    double K = 1.0 / (1.0 + 0.2316419 * abs(d));
+
+    setK(K);
+    return K;
 }
 
 
@@ -118,3 +123,22 @@ const double& blackScholesModel::getD1() const { return _d1; }
 const double& blackScholesModel::getD2() const { return _d2; }
 
 const double& blackScholesModel::getK() const { return _K; }
+
+
+double blackScholesModel::normalCDF(double d) const
+{
+    double L = abs(d);
+    double K = getK();
+
+    double denominator = 0.0;
+    const double coefficients[] {0.0, 0.1};
+
+    for (int i=0; i < 5; i++)
+    {
+        denominator += coefficients[i] * pow(K, i+1);
+    }
+    denominator *= sqrt(2 * )
+
+
+
+}
