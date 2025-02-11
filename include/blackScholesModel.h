@@ -33,8 +33,8 @@ class blackScholesModel
         } optionType;
 
     friend class inputReader;
-    friend class optionGreek;
-    friend class optionGreekModel;
+    friend class optionGreeks;
+    friend class optionGreeksModel;
     friend class hestonModel;
 
 

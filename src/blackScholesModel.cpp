@@ -125,6 +125,9 @@ const double& blackScholesModel::getD2() const { return _d2; }
 const double& blackScholesModel::getK() const { return _K; }
 
 
+/// @brief N(x) in Black-Scholes eq.
+/// @param d 
+/// @return cumilative distribution of d.
 double blackScholesModel::normalCDF(double d) const
 {
     double L = abs(d);
@@ -137,8 +140,12 @@ double blackScholesModel::normalCDF(double d) const
     {
         denominator += coefficients[i] * pow(K, i+1);
     }
-    denominator *= sqrt(2 * )
 
+    denominator *= sqrt(2 * 3.1415) * exp(-L * L / 2.0);
 
+    double result = 1.0 - 1.0 / denominator;
 
+    return d < 0 ? 1.0 - result : 1.0;
 }
+
+
