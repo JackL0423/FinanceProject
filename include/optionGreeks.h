@@ -24,7 +24,7 @@ class optionGreeks : public virtual blackScholesModel
         double calculateRho() const;
 
 
-        void setDelta(const double& val) { _delta = val; }
+        void setDelta(const double& val) const { _delta = val; }
 
         void setGamma(const double& val) const { _gamma = val; }
 
