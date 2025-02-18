@@ -17,7 +17,10 @@ enable_testing()
 
 add_executable(${PROJECT_NAME} ScholesModelTest.cpp)
 
-target_link_libraries(${PROJECT_NAME} GTest::gtest_main)
+add_library(ScholesModel ../include/blackScholesModel.h ../src/blackScholesModel.cpp)
+
+target_link_libraries(${PROJECT_NAME} ScholesModel GTest::gtest_main)
 
 include(GoogleTest)
 gtest_discover_tests(${PROJECT_NAME})
+
