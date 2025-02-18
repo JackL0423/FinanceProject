@@ -43,8 +43,8 @@ class blackScholesModel
     blackScholesModel(double underlyingPrice, double strikePrice, double timeToExpiration,
                       double riskFreeRate, double volatility);
     
-    blackScholesModel(double underlyingPrice, double strikePrice, double riskFreeRate,
-                      double timeToExpiration, double volatility, OptionType optionType);
+    blackScholesModel(double underlyingPrice, double strikePrice, double timeToExperation,
+                      double riskFreeRate, double volatility, OptionType optionType);
 
 
     double calculateOptionPrice();

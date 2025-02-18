@@ -64,8 +64,8 @@ blackScholesModel::blackScholesModel(double underlyingPrice, double strikePrice,
     _K = calculateK(_d1);
 }
 
-blackScholesModel::blackScholesModel(double underlyingPrice, double strikePrice, double riskFreeRate,
-                      double timeToExpiration, double volatility, OptionType optionType) : underlyingPrice(underlyingPrice),
+blackScholesModel::blackScholesModel(double underlyingPrice, double strikePrice, double timeToExperation,
+                      double riskFreeRate, double volatility, OptionType optionType) : underlyingPrice(underlyingPrice),
                       strikePrice(strikePrice), timeToExperation(timeToExperation), riskFreeRate(riskFreeRate), volatility(volatility),  optionType(optionType)
 {
     #ifndef debug
@@ -75,15 +75,6 @@ blackScholesModel::blackScholesModel(double underlyingPrice, double strikePrice,
     _d1 = calculateD1(underlyingPrice, strikePrice, timeToExperation, riskFreeRate, volatility);
     _d2 = calculateD2(underlyingPrice, strikePrice, timeToExperation, riskFreeRate, volatility);
     _K = calculateK(_d1);
-}
-
-
-void blackScholesModel::setUnderlyingPrice(const double& value)
-{
-    #ifndef debug
-    cout << "UnderlyingPrice set to " << value << endl;
-    #endif
-    underlyingPrice = value;
 }
 
 
@@ -134,7 +125,7 @@ double blackScholesModel::normalCDF(double d) const
     double K = getK();
 
     double denominator = 0.0;
-    const double coefficients[] {0.0, 0.1};
+    const double coefficients[2] = {0.0, 0.1};
 
     for (int i=0; i < 5; i++)
     {
@@ -147,5 +138,3 @@ double blackScholesModel::normalCDF(double d) const
 
     return d < 0 ? 1.0 - result : 1.0;
 }
-
-
