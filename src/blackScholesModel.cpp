@@ -26,6 +26,21 @@ double blackScholesModel::calculateD2(double underlyingPrice, double strikePrice
     return d2;
 }
 
+double blackScholesModel::calculateOptionPrice()
+{
+    _d1 = calculateD1(underlyingPrice, strikePrice, timeToExperation, riskFreeRate, volatility);
+    _d2 = calculateD2(underlyingPrice, strikePrice, timeToExperation, riskFreeRate, volatility);
+
+    switch(optionType) 
+    {
+        case OptionType::CALL:
+            return underlyingPrice * normalCDF(_d1) - strikePrice * exp(-riskFreeRate * timeToExperation) * normalCDF(_d2);
+        
+        case OptionType::PUT:
+            return strikePrice * exp(-riskFreeRate * timeToExperation) * normalCDF(-_d2) - underlyingPrice * normalCDF(-_d1);
+    }
+}
+
 
 double blackScholesModel::calculateK(double d) const
 {
