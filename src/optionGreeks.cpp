@@ -1,4 +1,4 @@
-#include "optionGreeks.h"
+#include "../include/optionGreeks.h"
 
 optionGreeks::optionGreeks()
 {
