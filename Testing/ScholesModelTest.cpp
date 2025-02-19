@@ -45,3 +45,57 @@ TEST(ScholesModelTests, ScholesModelConstructorWithValuesAndOption)
 
     EXPECT_EQ(b.getOptionType(), blackScholesModel::OptionType::CALL);
 }
+
+TEST(ScholesModelTests, calculateOptionPrice)
+{
+    blackScholesModel a;
+    EXPECT_EQ(a.calculateOptionPrice(), 0.0);
+
+    //  Add more asserts
+}
+
+TEST(ScholesModelTests, normalCDFcalculation)
+{
+    blackScholesModel b;
+    EXPECT_EQ(b.normalCDF(12.7), 0.0);
+
+    EXPECT_EQ(b.normalCDF(15.2), 0.0);
+}
+
+TEST(ScholesModelTests, calculateD1)
+{
+    blackScholesModel a;
+    EXPECT_EQ(a.getD1(), 0.0);
+
+    blackScholesModel b;
+    EXPECT_EQ(b.getD1(), 0.0);
+
+    blackScholesModel c;
+    EXPECT_EQ(c.getD1(), 0.0);
+}
+
+// Check these as comparing double to double and may need a tolerance.
+TEST(ScholesModelTests, calculateD2)
+{
+    blackScholesModel a;
+    EXPECT_EQ(a.getD2(), 0.0);
+
+    blackScholesModel b;
+    EXPECT_EQ(b.getD2(), 0.0);
+
+    blackScholesModel c;
+    EXPECT_EQ(c.getD2(), 0.0);
+}
+
+TEST(ScholesModelTests, calculateK)
+{
+    blackScholesModel a;
+    EXPECT_EQ(a.getK(), 0.0);
+
+    blackScholesModel b;
+    EXPECT_EQ(b.getK(), 0.0);
+
+    blackScholesModel c;
+    EXPECT_EQ(c.getK(), 0.0);
+}
+
