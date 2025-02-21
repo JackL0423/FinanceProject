@@ -7,30 +7,23 @@ using namespace std;
 
 class blackScholesModel
 {
-    double underlyingPrice;
-    double strikePrice;
-    double timeToExperation;
-    double riskFreeRate;
-    double volatility;      //  One varaible that cannot be predicted, future market risk
-
-
     mutable double _d1;
     mutable double _d2;
     mutable double _d;
     mutable double _K;
 
 
-    double calculateD1(double underlyingPrice, double strikePrice, double timeToExpiration, double riskFreeRate, double volatility) const;
+    void calculateD1();
 
-    double calculateD2(double underlyingPrice, double strikePrice, double timeToExpiration, double riskFreeRate, double volatility) const;
+    void calculateD2();
 
-    double calculateK(double d) const;
+    void calculateK();
 
     public:
         enum OptionType {
             CALL,
             PUT
-        } optionType;
+        } _optionType;
 
     friend class inputReader;
     friend class optionGreeks;
@@ -88,9 +81,14 @@ class blackScholesModel
     const double& getD2() const;
 
     const double& getK() const;
+
+    private:
+        double _underlyingPrice;
+        double _strikePrice;
+        double _timeToExperation;
+        double _riskFreeRate;
+        double _volatility;      //  One varaible that cannot be predicted, future market risk
+        
 };  //  BlackScholesModel Class 
 
 #endif  //  BLACKSCHOLESMODEL_H 
-//
-//
-//  Need to create a PUT system in order to do american systems, follows same proccess as mechanical vibrations ODE's

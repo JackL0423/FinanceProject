@@ -7,47 +7,42 @@
 
 using namespace std;
 
-double blackScholesModel::calculateD1(double underlyingPrice, double strikePrice, double timeToExperication, double riskFreeRate, double volatility) const
+void blackScholesModel::calculateD1()
 {
-    double numerator = log(underlyingPrice/strikePrice) + (riskFreeRate + 0.5 * volatility * volatility) * timeToExperation;
-    double denominator = volatility * sqrt(timeToExperation);
+    double numerator = log(getUnderlyingPrice()/getStrikePrice()) + (getRiskFreeRate() + 0.5 * getVolatility() * getVolatility()) * getTimeToExperation();
+    double denominator = getVolatility() * sqrt(getTimeToExperation());
     
     double d1 = numerator / denominator;
 
     setD1(d1);
-    return d1;
 }
 
-double blackScholesModel::calculateD2(double underlyingPrice, double strikePrice, double timeToExperation, double riskFreeRate, double volatility) const
+void blackScholesModel::calculateD2()
 {
-    double d2 = calculateD1(underlyingPrice, strikePrice, timeToExperation, riskFreeRate, volatility) - volatility * sqrt(timeToExperation);
+    double d2 = getD1() - getVolatility() * sqrt(getTimeToExperation());
 
     setD2(d2);
-    return d2;
 }
 
+// May need to double check this equation for the PUT return.
 double blackScholesModel::calculateOptionPrice()
 {
-    _d1 = calculateD1(underlyingPrice, strikePrice, timeToExperation, riskFreeRate, volatility);
-    _d2 = calculateD2(underlyingPrice, strikePrice, timeToExperation, riskFreeRate, volatility);
-
-    switch(optionType) 
+    switch(_optionType) 
     {
         case OptionType::CALL:
-            return underlyingPrice * normalCDF(_d1) - strikePrice * exp(-riskFreeRate * timeToExperation) * normalCDF(_d2);
+            return getUnderlyingPrice() * normalCDF(getD1()) - getStrikePrice() * exp(-getRiskFreeRate() * getTimeToExperation()) * normalCDF(getD2());
         
         case OptionType::PUT:
-            return strikePrice * exp(-riskFreeRate * timeToExperation) * normalCDF(-_d2) - underlyingPrice * normalCDF(-_d1);
+            return getStrikePrice() * exp(-getRiskFreeRate() * getTimeToExperation()) * normalCDF(-getD2()) - getUnderlyingPrice() * normalCDF(-getD1());
     }
 }
 
 
-double blackScholesModel::calculateK(double d) const
+void blackScholesModel::calculateK()
 {
-    double K = 1.0 / (1.0 + 0.2316419 * abs(d));
+    double K = 1.0 / (1.0 + 0.2316419 * abs(getD1()));
 
     setK(K);
-    return K;
 }
 
 
@@ -76,10 +71,10 @@ blackScholesModel::blackScholesModel(double underlyingPrice, double strikePrice,
     setRiskFreeRate(riskFreeRate);
     setVolatility(volatility);
     setOptionType(OptionType::CALL);
-    //  Calculate _d1, _d2, and K
-    _d1 = calculateD1(underlyingPrice, strikePrice, timeToExperation, riskFreeRate, volatility);
-    _d2 = calculateD2(underlyingPrice, strikePrice, timeToExperation, riskFreeRate, volatility);
-    _K = calculateK(_d1);
+
+    calculateD1();
+    calculateD2();
+    calculateK();
 }
 
 blackScholesModel::blackScholesModel(double underlyingPrice, double strikePrice, double timeToExperation, double riskFreeRate, double volatility, OptionType optionType)
@@ -95,9 +90,9 @@ blackScholesModel::blackScholesModel(double underlyingPrice, double strikePrice,
     setVolatility(volatility);
     setOptionType(optionType);
 
-    _d1 = calculateD1(underlyingPrice, strikePrice, timeToExperation, riskFreeRate, volatility);
-    _d2 = calculateD2(underlyingPrice, strikePrice, timeToExperation, riskFreeRate, volatility);
-    _K = calculateK(_d1);
+    calculateD1();
+    calculateD2();
+    calculateK();
 }
 
 
@@ -106,7 +101,7 @@ void blackScholesModel::setUnderlyingPrice(const double& value)
     #ifndef debug
     cout << "Setting UnderlyingPrice = " << value << endl;
     #endif
-    underlyingPrice = value; 
+    _underlyingPrice = value; 
 }
 
 void blackScholesModel::setStrikePrice(const double& value) 
@@ -114,7 +109,7 @@ void blackScholesModel::setStrikePrice(const double& value)
     #ifndef debug
     cout << "Setting StrikePrice = " << value << endl;
     #endif 
-    strikePrice = value; 
+    _strikePrice = value; 
 }
 
 void blackScholesModel::setTimeToExperation(const double& value) 
@@ -122,7 +117,7 @@ void blackScholesModel::setTimeToExperation(const double& value)
     #ifndef debug
     cout << "Setting timeToExperation = " << value << endl; 
     #endif
-    timeToExperation = value; 
+    _timeToExperation = value; 
 }
 
 void blackScholesModel::setRiskFreeRate(const double& value) 
@@ -130,7 +125,7 @@ void blackScholesModel::setRiskFreeRate(const double& value)
     #ifndef debug
     cout << "Setting riskFreeRate = " << value << endl;
     #endif
-    riskFreeRate = value; 
+    _riskFreeRate = value; 
 }
 
 void blackScholesModel::setVolatility(const double& value) 
@@ -138,7 +133,7 @@ void blackScholesModel::setVolatility(const double& value)
     #ifndef debug
     cout << "Setting volatility = " << value << endl;
     #endif
-    volatility = value;
+    _volatility = value;
 }
 
 void blackScholesModel::setOptionType(const OptionType& option) 
@@ -146,7 +141,7 @@ void blackScholesModel::setOptionType(const OptionType& option)
     #ifndef debug
     cout << "Setting OptionType = " << option << endl;
     #endif 
-    optionType = option; 
+    _optionType = option; 
 }
 
 void blackScholesModel::setD1(const double& value) const 
@@ -174,17 +169,17 @@ void blackScholesModel::setK(const double& value) const
 }
 
 
-const double& blackScholesModel::getUnderlyingPrice() const { return underlyingPrice; }
+const double& blackScholesModel::getUnderlyingPrice() const { return _underlyingPrice; }
 
-const double& blackScholesModel::getStrikePrice() const { return strikePrice; }
+const double& blackScholesModel::getStrikePrice() const { return _strikePrice; }
 
-const double& blackScholesModel::getTimeToExperation() const { return timeToExperation; }
+const double& blackScholesModel::getTimeToExperation() const { return _timeToExperation; }
 
-const double& blackScholesModel::getRiskFreeRate() const { return riskFreeRate; }
+const double& blackScholesModel::getRiskFreeRate() const { return _riskFreeRate; }
 
-const double& blackScholesModel::getVolatility() const { return volatility; }
+const double& blackScholesModel::getVolatility() const { return _volatility; }
 
-const blackScholesModel::OptionType blackScholesModel::getOptionType() const { return optionType; }
+const blackScholesModel::OptionType blackScholesModel::getOptionType() const { return _optionType; }
 
 const double& blackScholesModel::getD1() const { return _d1; }
 
