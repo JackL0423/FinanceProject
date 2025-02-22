@@ -27,7 +27,7 @@ void blackScholesModel::calculateD2()
 // May need to double check this equation for the PUT return.
 double blackScholesModel::calculateOptionPrice()
 {
-    switch(_optionType) 
+    switch(getOptionType()) 
     {
         case OptionType::CALL:
             return getUnderlyingPrice() * normalCDF(getD1()) - getStrikePrice() * exp(-getRiskFreeRate() * getTimeToExperation()) * normalCDF(getD2());
@@ -57,6 +57,7 @@ blackScholesModel::blackScholesModel()
     setRiskFreeRate(0.0);
     setVolatility(0.0);
     setOptionType(OptionType::CALL);
+    setD1(nan(""));
 }
 
 blackScholesModel::blackScholesModel(double underlyingPrice, double strikePrice, double timeToExperation,double riskFreeRate, double volatility)
@@ -94,7 +95,6 @@ blackScholesModel::blackScholesModel(double underlyingPrice, double strikePrice,
     calculateD2();
     calculateK();
 }
-
 
 void blackScholesModel::setUnderlyingPrice(const double& value) 
 {
@@ -168,7 +168,6 @@ void blackScholesModel::setK(const double& value) const
     _K = value;
 }
 
-
 const double& blackScholesModel::getUnderlyingPrice() const { return _underlyingPrice; }
 
 const double& blackScholesModel::getStrikePrice() const { return _strikePrice; }
@@ -186,7 +185,6 @@ const double& blackScholesModel::getD1() const { return _d1; }
 const double& blackScholesModel::getD2() const { return _d2; }
 
 const double& blackScholesModel::getK() const { return _K; }
-
 
 /// @brief N(x) in Black-Scholes eq.
 /// @param d 
