@@ -28,7 +28,7 @@ optionGreeks::optionGreeks(double underlyingPrice, double strikePrice, double ti
 
 double optionGreeks::calculateDelta() const
 {
-    double delta = exp(-_d1 * _d1 / 2) / sqrt(2 * M_PI);
+    double delta = exp(-getD1() * getD1() / 2) / sqrt(2 * M_PI);
 
     setDelta(delta);
 
@@ -37,7 +37,7 @@ double optionGreeks::calculateDelta() const
 
 double optionGreeks::calculateGamma() const
 {
-    double gamma = exp(-_d1 * _d1 / 2) / (sqrt(2 * M_PI) * underlyingPrice * volatility * sqrt(timeToExperation));
+    double gamma = exp(-getD2() * getD1() / 2) / (sqrt(2 * M_PI) * getUnderlyingPrice() * getVolatility() * sqrt(getTimeToExperation()));
 
     setGamma(gamma);
 
@@ -46,7 +46,7 @@ double optionGreeks::calculateGamma() const
 
 double optionGreeks::calculateVega() const
 {
-    double vega = underlyingPrice * exp(-_d1 * _d1 / 2) * sqrt(timeToExperation);
+    double vega = getUnderlyingPrice() * exp(-getD1() * getD1() / 2) * sqrt(getTimeToExperation());
 
     setVega(vega);
 
@@ -55,7 +55,7 @@ double optionGreeks::calculateVega() const
 
 double optionGreeks::calculateTheta() const
 {
-    double theta = -underlyingPrice * exp(-_d1 * _d1 / 2) * volatility / (2* sqrt(timeToExperation)) - riskFreeRate * _K * exp(-riskFreeRate * timeToExperation) * normalCDF(_d2);
+    double theta = -getUnderlyingPrice() * exp(-getD1() * getD1() / 2) * getVolatility() / (2* sqrt(getTimeToExperation())) - getRiskFreeRate() * getK() * exp(-getRiskFreeRate() * getTimeToExperation()) * normalCDF(getD2());
 
     setTheta(theta);
 
@@ -64,7 +64,7 @@ double optionGreeks::calculateTheta() const
 
 double optionGreeks::calculateRho() const
 {
-    double rho = _K * timeToExperation * exp(-riskFreeRate * timeToExperation) * normalCDF(_d2);
+    double rho = getK() * getTimeToExperation() * exp(-getRiskFreeRate() * getTimeToExperation()) * normalCDF(getD2());
 
     setRho(rho);
 
