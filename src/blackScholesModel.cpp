@@ -3,8 +3,6 @@
 #include <numbers>
 #include "../include/blackScholesModel.h"
 
-#undef DEBUG
-
 using namespace std;
 
 void blackScholesModel::calculateD1()
@@ -48,9 +46,6 @@ void blackScholesModel::calculateK()
 
 blackScholesModel::blackScholesModel()
 {
-    #ifndef debug
-    cout << "Calling default constructor for scholes model...\n";
-    #endif
     setUnderlyingPrice(0.0);
     setStrikePrice(0.0);
     setTimeToExperation(0.0);
@@ -62,9 +57,6 @@ blackScholesModel::blackScholesModel()
 
 blackScholesModel::blackScholesModel(double underlyingPrice, double strikePrice, double timeToExperation,double riskFreeRate, double volatility)
 {
-    #ifndef debug
-    cout << "Calling constructor with no optionType for scholes model...\n";
-    #endif
 
     setUnderlyingPrice(underlyingPrice);
     setStrikePrice(strikePrice);
@@ -80,10 +72,6 @@ blackScholesModel::blackScholesModel(double underlyingPrice, double strikePrice,
 
 blackScholesModel::blackScholesModel(double underlyingPrice, double strikePrice, double timeToExperation, double riskFreeRate, double volatility, OptionType optionType)
 {
-    #ifndef debug
-    cout << "Calling constructor with optionType for scholes model...\n";
-    #endif
-
     setUnderlyingPrice(underlyingPrice);
     setStrikePrice(strikePrice);
     setTimeToExperation(timeToExperation);
@@ -98,73 +86,46 @@ blackScholesModel::blackScholesModel(double underlyingPrice, double strikePrice,
 
 void blackScholesModel::setUnderlyingPrice(const double& value) 
 {
-    #ifndef debug
-    cout << "Setting UnderlyingPrice = " << value << endl;
-    #endif
     _underlyingPrice = value; 
 }
 
 void blackScholesModel::setStrikePrice(const double& value) 
 {
-    #ifndef debug
-    cout << "Setting StrikePrice = " << value << endl;
-    #endif 
     _strikePrice = value; 
 }
 
 void blackScholesModel::setTimeToExperation(const double& value) 
 {
-    #ifndef debug
-    cout << "Setting timeToExperation = " << value << endl; 
-    #endif
     _timeToExperation = value; 
 }
 
 void blackScholesModel::setRiskFreeRate(const double& value) 
 { 
-    #ifndef debug
-    cout << "Setting riskFreeRate = " << value << endl;
-    #endif
     _riskFreeRate = value; 
 }
 
 void blackScholesModel::setVolatility(const double& value) 
 { 
-    #ifndef debug
-    cout << "Setting volatility = " << value << endl;
-    #endif
     _volatility = value;
 }
 
 void blackScholesModel::setOptionType(const OptionType& option) 
 {
-    #ifndef debug
-    cout << "Setting OptionType = " << option << endl;
-    #endif 
     _optionType = option; 
 }
 
 void blackScholesModel::setD1(const double& value) const 
 {
-    #ifndef debug
-    cout << "Setting _d1 = " << value << endl;
-    #endif
     _d1 = value;
 }
 
 void blackScholesModel::setD2(const double& value) const 
 {
-    #ifndef debug
-    cout << "Setting _d2 = " << value << endl;
-    #endif
     _d2 = value;
 }
 
 void blackScholesModel::setK(const double& value) const 
 {
-    #ifndef debug
-    cout << "Setting _K = " << value << endl;
-    #endif
     _K = value;
 }
 
