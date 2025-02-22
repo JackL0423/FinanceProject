@@ -1,10 +1,10 @@
-
 cmake_minimum_required(VERSION 3.27)
 
-set(CXX_STANDARD CXX 23)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-project(scholesTest)
+set(CXX_STANDARD CXX 23)
+set(CMAKE_CXX_STANDARD_REQUIRED OFF)
+
+project(ModelTests)
 
 include(FetchContent)
 FetchContent_Declare(
@@ -15,11 +15,13 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
-add_executable(${PROJECT_NAME} ScholesModelTest.cpp)
+add_executable(${PROJECT_NAME} test_blackScholesModel.cpp test_optionGreeks.cpp)
 
 add_library(ScholesModel ../include/blackScholesModel.h ../src/blackScholesModel.cpp)
 
-target_link_libraries(${PROJECT_NAME} ScholesModel GTest::gtest_main)
+add_library(optionGreeks ../include/optionGreeks.h ../src/optionGreeks.cpp)
+
+target_link_libraries(${PROJECT_NAME} ScholesModel optionGreeks GTest::gtest_main)
 
 include(GoogleTest)
 gtest_discover_tests(${PROJECT_NAME})
