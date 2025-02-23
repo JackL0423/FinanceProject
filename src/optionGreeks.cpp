@@ -2,9 +2,6 @@
 
 optionGreeks::optionGreeks()
 {
-    _d1 = getD1();
-    _d2 = getD2();
-    _K = getK();
     _delta = getDelta();
     _gamma = getGamma();
     _vega = getVega();
@@ -16,58 +13,45 @@ optionGreeks::optionGreeks(double underlyingPrice, double strikePrice, double ti
                            double riskFreeRate, double volatility) : 
                            blackScholesModel(underlyingPrice, strikePrice, timeToExperation, riskFreeRate, volatility)
 {
-    _d1 = getD1();
-    _d2 = getD2();
-    _K = getK();
-    _delta = getDelta();
-    _gamma = getGamma();
-    _vega = getVega();
-    _theta = getTheta();
-    _rho = getRho();
+    calculateDelta();
+    calculateGamma();
+    calculateVega();
+    calculateTheta();
+    calculateRho();
 }
 
-double optionGreeks::calculateDelta() const
+void optionGreeks::calculateDelta()
 {
     double delta = exp(-getD1() * getD1() / 2) / sqrt(2 * M_PI);
 
     setDelta(delta);
-
-    return delta;
 }
 
-double optionGreeks::calculateGamma() const
+void optionGreeks::calculateGamma()
 {
     double gamma = exp(-getD2() * getD1() / 2) / (sqrt(2 * M_PI) * getUnderlyingPrice() * getVolatility() * sqrt(getTimeToExperation()));
 
     setGamma(gamma);
-
-    return gamma;
 }
 
-double optionGreeks::calculateVega() const
+void optionGreeks::calculateVega()
 {
     double vega = getUnderlyingPrice() * exp(-getD1() * getD1() / 2) * sqrt(getTimeToExperation());
 
     setVega(vega);
-
-    return vega;
 }
 
-double optionGreeks::calculateTheta() const
+void optionGreeks::calculateTheta()
 {
     double theta = -getUnderlyingPrice() * exp(-getD1() * getD1() / 2) * getVolatility() / (2* sqrt(getTimeToExperation())) - getRiskFreeRate() * getK() * exp(-getRiskFreeRate() * getTimeToExperation()) * normalCDF(getD2());
 
     setTheta(theta);
-
-    return theta;
 }
 
-double optionGreeks::calculateRho() const
+void optionGreeks::calculateRho()
 {
     double rho = getK() * getTimeToExperation() * exp(-getRiskFreeRate() * getTimeToExperation()) * normalCDF(getD2());
 
     setRho(rho);
-
-    return rho;
 }
 

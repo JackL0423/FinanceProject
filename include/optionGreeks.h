@@ -13,15 +13,15 @@ class optionGreeks : public virtual blackScholesModel
         optionGreeks(double underlyingPrice, double strikePrice, double timeToExperation,
                      double riskFreeRate, double volatility);
 
-        double calculateDelta() const;
+        void calculateDelta();
 
-        double calculateGamma() const;
+        void calculateGamma();
 
-        double calculateVega() const;
+        void calculateVega();
 
-        double calculateTheta() const;
+        void calculateTheta();
 
-        double calculateRho() const;
+        void calculateRho();
 
 
         void setDelta(const double& val) const { _delta = val; }
