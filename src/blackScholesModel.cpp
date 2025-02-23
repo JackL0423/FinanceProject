@@ -32,6 +32,8 @@ double blackScholesModel::calculateOptionPrice()
         
         case OptionType::PUT:
             return getStrikePrice() * exp(-getRiskFreeRate() * getTimeToExperation()) * normalCDF(-getD2()) - getUnderlyingPrice() * normalCDF(-getD1());
+        default:
+            return nan("");
     }
 }
 
@@ -51,8 +53,10 @@ blackScholesModel::blackScholesModel()
     setTimeToExperation(0.0);
     setRiskFreeRate(0.0);
     setVolatility(0.0);
-    setOptionType(OptionType::CALL);
+    //setOptionType(OptionType::CALL);
     setD1(nan(""));
+    setD2(nan(""));
+    setK(nan(""));
 }
 
 blackScholesModel::blackScholesModel(double underlyingPrice, double strikePrice, double timeToExperation,double riskFreeRate, double volatility)
@@ -63,7 +67,7 @@ blackScholesModel::blackScholesModel(double underlyingPrice, double strikePrice,
     setTimeToExperation(timeToExperation);
     setRiskFreeRate(riskFreeRate);
     setVolatility(volatility);
-    setOptionType(OptionType::CALL);
+    //setOptionType(OptionType::CALL);
 
     calculateD1();
     calculateD2();
