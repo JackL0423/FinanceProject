@@ -2,11 +2,11 @@
 
 optionGreeks::optionGreeks()
 {
-    _delta = getDelta();
-    _gamma = getGamma();
-    _vega = getVega();
-    _theta = getTheta();
-    _rho = getRho();
+    calculateDelta();
+    calculateGamma();
+    calculateVega();
+    calculateTheta();
+    calculateRho();
 }
 
 optionGreeks::optionGreeks(double underlyingPrice, double strikePrice, double timeToExperation,
