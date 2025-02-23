@@ -69,14 +69,47 @@ TEST_F(blackScholesModelTest, calculateD2Test1)
     EXPECT_NEAR(a.getD2(), expectedD2, 1e-6);
 }
 
+TEST_F(blackScholesModelTest, calculateD2Test2)
+{
+    double expectedD2 = b.getD1() - 2.71 * sqrt(45.3);
+    EXPECT_NEAR(b.getD2(), expectedD2, 1e-6);
+}
+
+TEST_F(blackScholesModelTest, calculateD2Test3)
+{
+    EXPECT_TRUE(isnan(c.getD2()));
+}
+
 TEST_F(blackScholesModelTest, calculateOptionPriceTest1)
 {
     double expectedOptionPrice = 13.3 * exp(-6.2 * 18.0) * a.normalCDF(-a.getD2()) - 16.2 * a.normalCDF(-a.getD1());
     EXPECT_NEAR(a.calculateOptionPrice(), expectedOptionPrice, 1e-6);
 }
 
+TEST_F(blackScholesModelTest, calculateOptionPriceTest2)
+{
+    double expectedOptionPrice = b.getUnderlyingPrice() * b.normalCDF(b.getD1()) - b.getStrikePrice() * exp(-b.getRiskFreeRate() * b.getTimeToExperation()) * b.normalCDF(b.getD2());
+    EXPECT_NEAR(b.calculateOptionPrice(), expectedOptionPrice, 1e-6);
+}
+
+TEST_F(blackScholesModelTest, calculateOptionPriceTest3)
+{
+    EXPECT_TRUE(isnan(c.calculateOptionPrice()));
+}
+
 TEST_F(blackScholesModelTest, calculateKTest1)
 {
     double expectedK = 1.0 / (1.0 + 0.2316419 * abs(a.getD1()));
     EXPECT_NEAR(a.getK(), expectedK, 1e-6);
+}
+
+TEST_F(blackScholesModelTest, calculateKTest2)
+{
+    double expectedK = 1.0 / (1.0 + 0.2316419 * abs(b.getD1()));
+    EXPECT_NEAR(b.getK(), expectedK, 1e-6);
+}
+
+TEST_F(blackScholesModelTest, calculateKTest3)
+{
+    EXPECT_TRUE(isnan(c.getK()));
 }

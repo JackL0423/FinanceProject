@@ -24,5 +24,6 @@ add_library(optionGreeks ../include/optionGreeks.h ../src/optionGreeks.cpp)
 target_link_libraries(${PROJECT_NAME} ScholesModel optionGreeks GTest::gtest_main)
 
 include(GoogleTest)
+
 gtest_discover_tests(${PROJECT_NAME})
 
