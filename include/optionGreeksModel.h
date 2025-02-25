@@ -11,7 +11,7 @@ class optionGreeksModel : public virtual blackScholesModel, public optionGreeks
     optionGreeksModel(double underlyingPrice, double strikePrice, double timeToExperation, double riskFreeRate, double volatility);
 
 
-    void setOptionPriveIV(double value) const;
+    void setOptionPriceIV(double value) const;
 
     void setOptionPriceGamma(double value) const;
 
@@ -50,6 +50,17 @@ class optionGreeksModel : public virtual blackScholesModel, public optionGreeks
     const double& getThetaAdjustedDelta() const;
 
     const double& getGammaVegaAdjustedDelta() const;
+
+    
+    void calculateOptionPriceIV(double impliedVolatility) const;
+
+    void calculateOptionPriceGamma() const;
+
+    void calculateOptionPriceVega() const;
+
+    void calculateOptionPriceTheta() const;
+
+    void calculateOptionPriceGammaVega() const;
 
 
 
