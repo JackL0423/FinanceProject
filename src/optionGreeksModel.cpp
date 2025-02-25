@@ -119,5 +119,7 @@ void optionGreeksModel::calculateOptionPriceTheta() const
 
 void optionGreeksModel::calculateOptionPriceGammaVega() const
 {
-    
+    double optionPriceGammaVega = getGammaAdjustedDelta() * getUnderlyingPrice() + 0.5 * getGamma() * pow(getUnderlyingPrice(),2) - getVega() * (getUnderlyingPrice() * sqrt(getTimeToExperation()) * exp(-getRiskFreeRate() * getTimeToExperation()) / 100.0);
+
+    setOptionPriceGammaVega(optionPriceGammaVega);
 }
