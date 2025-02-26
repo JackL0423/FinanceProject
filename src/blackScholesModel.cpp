@@ -31,10 +31,10 @@ double blackScholesModel::calculateOptionPrice()
 {
     switch(getOptionType()) 
     {
-        case OptionType::CALL:
+        case CALL:
             return getUnderlyingPrice() * normalCDF(getD1()) - getStrikePrice() * exp(-getRiskFreeRate() * getTimeToExperation()) * normalCDF(getD2());
         
-        case OptionType::PUT:
+        case PUT:
             return getStrikePrice() * exp(-getRiskFreeRate() * getTimeToExperation()) * normalCDF(-getD2()) - getUnderlyingPrice() * normalCDF(-getD1());
         default:
             return nan("");
@@ -54,6 +54,7 @@ void blackScholesModel::calculateK()
 /// @brief default constructor for the Black-Scholes model.
 blackScholesModel::blackScholesModel()
 {
+    //  TODO: #3 [refactoring] Look at default values for scholes model. May be better to set all default as NaN and do checks.
     setUnderlyingPrice(0.0);
     setStrikePrice(0.0);
     setTimeToExperation(0.0);

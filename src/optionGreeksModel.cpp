@@ -8,7 +8,7 @@ optionGreeksModel::optionGreeksModel()
 optionGreeksModel::optionGreeksModel(double underlyingPrice, double strikePrice, double timeToExperation, double riskFreeRate, double volatility)
     : optionGreeks(underlyingPrice, strikePrice, timeToExperation, riskFreeRate, volatility)
 {
-    // TODO: #3 [enhancement] Initialize the optionGreeksModel with given parameters
+    // TODO: #4 [enhancement] Initialize the optionGreeksModel with given parameters
 }
 
 void optionGreeksModel::setOptionPriceIV(double value) const

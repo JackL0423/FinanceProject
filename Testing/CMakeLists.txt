@@ -15,7 +15,7 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
-# TODO: #5 [feature] Update executables and libraries in Testing CMakeLists.txt
+# TODO: #6 [feature] Update executables and libraries in Testing CMakeLists.txt
 
 add_executable(${PROJECT_NAME} test_blackScholesModel.cpp test_optionGreeks.cpp)
 
