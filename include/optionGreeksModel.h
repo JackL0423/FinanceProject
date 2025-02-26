@@ -6,71 +6,72 @@
 
 class optionGreeksModel : public virtual blackScholesModel, public optionGreeks
 {
-    optionGreeksModel();
+    public:
+        optionGreeksModel();
 
-    optionGreeksModel(double underlyingPrice, double strikePrice, double timeToExperation, double riskFreeRate, double volatility);
+        optionGreeksModel(double underlyingPrice, double strikePrice, double timeToExperation, double riskFreeRate, double volatility);
 
+        // TODO: #8 Fix set functions to intake const double& value
+        void setOptionPriceIV(double value) const;
 
-    void setOptionPriceIV(double value) const;
+        void setOptionPriceGamma(double value) const;
 
-    void setOptionPriceGamma(double value) const;
+        void setOptionPriceVega(double value) const;
 
-    void setOptionPriceVega(double value) const;
+        void setOptionPriceTheta(double value) const;
 
-    void setOptionPriceTheta(double value) const;
+        void setOptionPriceGammaVega(double value) const;
 
-    void setOptionPriceGammaVega(double value) const;
+        void setIVAdjustedDelta(double value) const;
 
-    void setIVAdjustedDelta(double value) const;
+        void setGammaAdjustedDelta(double value) const;
 
-    void setGammaAdjustedDelta(double value) const;
+        void setVegaAdjustedDelta(double value) const;
 
-    void setVegaAdjustedDelta(double value) const;
+        void setThetaAdjustedDelta(double value) const;
 
-    void setThetaAdjustedDelta(double value) const;
+        void setGammaVegaAdjustedDelta(double value) const;
 
-    void setGammaVegaAdjustedDelta(double value) const;
+        const double& getOptionPriceIV() const;
 
-    const double& getOptionPriceIV() const;
+        const double& getOptionPriceGamma() const;
 
-    const double& getOptionPriceGamma() const;
+        const double& getOptionPriceVega() const;
 
-    const double& getOptionPriceVega() const;
+        const double& getOptionPriceTheta() const;
 
-    const double& getOptionPriceTheta() const;
+        const double& getOptionPriceGammaVega() const;
 
-    const double& getOptionPriceGammaVega() const;
+        const double& getIVAdjustedDelta() const;
 
-    const double& getIVAdjustedDelta() const;
+        const double& getGammaAdjustedDelta() const;
 
-    const double& getGammaAdjustedDelta() const;
+        const double& getVegaAdjustedDelta() const;
 
-    const double& getVegaAdjustedDelta() const;
+        const double& getThetaAdjustedDelta() const;
 
-    const double& getThetaAdjustedDelta() const;
+        const double& getGammaVegaAdjustedDelta() const;
 
-    const double& getGammaVegaAdjustedDelta() const;
+        
+        void calculateOptionPriceIV(double impliedVolatility) const;
 
-    
-    void calculateOptionPriceIV(double impliedVolatility) const;
+        void calculateOptionPriceGamma() const;
 
-    void calculateOptionPriceGamma() const;
+        void calculateOptionPriceVega() const;
 
-    void calculateOptionPriceVega() const;
+        void calculateOptionPriceTheta() const;
 
-    void calculateOptionPriceTheta() const;
+        void calculateOptionPriceGammaVega() const;
 
-    void calculateOptionPriceGammaVega() const;
+        void calculateIVAdjustedDelta(double impliedVolatility) const;
 
-    void calculateIVAdjustedDelta(double impliedVolatility) const;
+        void calculateGammaAdjustedDelta() const;
 
-    void calculateGammaAdjustedDelta() const;
+        void calculateVegaAdjustedDelta() const;
 
-    void calculateVegaAdjustedDelta() const;
+        void calculateThetaAdjustedDelta() const;
 
-    void calculateThetaAdjustedDelta() const;
-
-    void calculateGammaVegaAdjustedDelta() const;
+        void calculateGammaVegaAdjustedDelta() const;
 
     private:
         mutable double _ivAdjustedDelta;

@@ -2,7 +2,6 @@
 
 optionGreeksModel::optionGreeksModel() : optionGreeks(0.0, 0.0, 0.0, 0.0, 0.0)
 {
-    // TODO: #2 write optionGreeksModel default constructor
     setOptionPriceIV(0.0);
     setOptionPriceGamma(0.0);
     setOptionPriceVega(0.0);
@@ -20,6 +19,16 @@ optionGreeksModel::optionGreeksModel(double underlyingPrice, double strikePrice,
     : optionGreeks(underlyingPrice, strikePrice, timeToExperation, riskFreeRate, volatility)
 {
     // TODO: #4 [enhancement] Initialize the optionGreeksModel with given parameters
+    setOptionPriceIV(0.0);
+    setOptionPriceGamma(0.0);
+    setOptionPriceVega(0.0);
+    setOptionPriceTheta(0.0);
+    setOptionPriceGammaVega(0.0);
+    setIVAdjustedDelta(0.0);
+    setGammaAdjustedDelta(0.0);
+    setVegaAdjustedDelta(0.0);
+    setThetaAdjustedDelta(0.0);
+    setGammaVegaAdjustedDelta(0.0);
 }
 
 void optionGreeksModel::setOptionPriceIV(double value) const
