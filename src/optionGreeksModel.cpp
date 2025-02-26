@@ -1,8 +1,19 @@
 #include "../include/optionGreeksModel.h"
 
-optionGreeksModel::optionGreeksModel()
+optionGreeksModel::optionGreeksModel() : optionGreeks(0.0, 0.0, 0.0, 0.0, 0.0)
 {
     // TODO: #2 write optionGreeksModel default constructor
+    setOptionPriceIV(0.0);
+    setOptionPriceGamma(0.0);
+    setOptionPriceVega(0.0);
+    setOptionPriceTheta(0.0);
+    setOptionPriceGammaVega(0.0);
+    setIVAdjustedDelta(0.0);
+    setGammaAdjustedDelta(0.0);
+    setVegaAdjustedDelta(0.0);
+    setThetaAdjustedDelta(0.0);
+    setGammaVegaAdjustedDelta(0.0);
+
 }
 
 optionGreeksModel::optionGreeksModel(double underlyingPrice, double strikePrice, double timeToExperation, double riskFreeRate, double volatility)
