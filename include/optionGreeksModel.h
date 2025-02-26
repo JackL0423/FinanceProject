@@ -62,7 +62,15 @@ class optionGreeksModel : public virtual blackScholesModel, public optionGreeks
 
     void calculateOptionPriceGammaVega() const;
 
+    void calculateIVAdjustedDelta(double impliedVolatility) const;
 
+    void calculateGammaAdjustedDelta() const;
+
+    void calculateVegaAdjustedDelta() const;
+
+    void calculateThetaAdjustedDelta() const;
+
+    void calculateGammaVegaAdjustedDelta() const;
 
     private:
         mutable double _ivAdjustedDelta;

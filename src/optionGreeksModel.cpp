@@ -123,3 +123,40 @@ void optionGreeksModel::calculateOptionPriceGammaVega() const
 
     setOptionPriceGammaVega(optionPriceGammaVega);
 }
+
+void optionGreeksModel::calculateIVAdjustedDelta(double impliedVolatility) const
+{
+    double d1 = getD1();
+    
+    double ivAdjustedDelta = normalCDF(d1);
+
+    setIVAdjustedDelta(ivAdjustedDelta);
+}
+
+void optionGreeksModel::calculateGammaAdjustedDelta() const
+{
+    double gammaAdjustedDelta = getDelta() + (0.5 * getGamma());
+
+    setGammaAdjustedDelta(gammaAdjustedDelta);
+}
+
+void optionGreeksModel::calculateVegaAdjustedDelta() const
+{
+    double vegaAdjustedDelta = getDelta() + getVega();
+
+    setVegaAdjustedDelta(vegaAdjustedDelta);
+}
+
+void optionGreeksModel::calculateThetaAdjustedDelta() const
+{
+    double thetaAdjustedDelta = getDelta() - getTheta();
+
+    setThetaAdjustedDelta(thetaAdjustedDelta);
+}
+
+void optionGreeksModel::calculateGammaVegaAdjustedDelta() const
+{
+    double gammaVegaAdjustedDelta = getDelta() + (0.5 * getGamma()) + getVega();
+
+    setGammaVegaAdjustedDelta(gammaVegaAdjustedDelta);
+}
