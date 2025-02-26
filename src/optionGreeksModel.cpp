@@ -2,13 +2,13 @@
 
 optionGreeksModel::optionGreeksModel()
 {
-    // TODO: #2 Implement optionGreeksModel default constructor
+    // TODO: #2 write optionGreeksModel default constructor
 }
 
 optionGreeksModel::optionGreeksModel(double underlyingPrice, double strikePrice, double timeToExperation, double riskFreeRate, double volatility)
     : optionGreeks(underlyingPrice, strikePrice, timeToExperation, riskFreeRate, volatility)
 {
-    // TODO: #3 Implement optionGreeksModel constructor with parameters
+    // TODO: #3 [enhancement] Initialize the optionGreeksModel with given parameters
 }
 
 void optionGreeksModel::setOptionPriceIV(double value) const
