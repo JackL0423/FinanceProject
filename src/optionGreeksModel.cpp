@@ -87,7 +87,7 @@ void optionGreeksModel::calculateOptionPriceIV(double impliedVolatility) const
     double delta = getIVAdjustedDelta();
 
     // TODO: #1 write overloaded function for calculateD1(imlpiedVolatility)
-    double d1 = getD1();    // Need to make overloaded function with impliedVolatility
+    double d1 = getD1();
     double d2 = d1 - (impliedVolatility * sqrt(getTimeToExperation())); // Make into overloaded func.
 
     double optionPriceIV = (delta * getUnderlyingPrice() * normalCDF(d1)) 
