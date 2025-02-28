@@ -29,6 +29,10 @@ void blackScholesModel::calculateD2()
 /// @return the option price.
 double blackScholesModel::calculateOptionPrice()
 {
+    if (isnan(getD1()) || isnan(getD2()))
+    {
+        return nan("");
+    }
     switch(getOptionType()) 
     {
         case CALL:
