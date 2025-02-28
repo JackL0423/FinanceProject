@@ -102,7 +102,7 @@ const double& optionGreeksModel::getThetaAdjustedDelta() const { return _thetaAd
 const double& optionGreeksModel::getGammaVegaAdjustedDelta() const { return _gammaVegaAdjustedDelta; }
 
     
-void optionGreeksModel::calculateOptionPriceIV(double impliedVolatility) const
+void optionGreeksModel::calculateOptionPriceIV(const double& impliedVolatility) const
 {
     double delta = getIVAdjustedDelta();
 
