@@ -31,52 +31,52 @@ optionGreeksModel::optionGreeksModel(double underlyingPrice, double strikePrice,
     setGammaVegaAdjustedDelta(0.0);
 }
 
-void optionGreeksModel::setOptionPriceIV(double value) const
+void optionGreeksModel::setOptionPriceIV(const double& value) const
 {
     _optionPriceIv = value;
 }
 
-void optionGreeksModel::setOptionPriceGamma(double value) const
+void optionGreeksModel::setOptionPriceGamma(const double& value) const
 {
     _optionPriceGamma = value;
 }
 
-void optionGreeksModel::setOptionPriceVega(double value) const
+void optionGreeksModel::setOptionPriceVega(const double& value) const
 {
     _optionPriceVega = value;
 }
 
-void optionGreeksModel::setOptionPriceTheta(double value) const
+void optionGreeksModel::setOptionPriceTheta(const double& value) const
 {
     _optionPriceTheta = value;
 }
 
-void optionGreeksModel::setOptionPriceGammaVega(double value) const
+void optionGreeksModel::setOptionPriceGammaVega(const double& value) const
 {
     _optionPriceGammaVega = value;
 }
 
-void optionGreeksModel::setIVAdjustedDelta(double value) const
+void optionGreeksModel::setIVAdjustedDelta(const double& value) const
 {
     _ivAdjustedDelta = value;
 }
 
-void optionGreeksModel::setGammaAdjustedDelta(double value) const
+void optionGreeksModel::setGammaAdjustedDelta(const double& value) const
 {
     _gammaAdjustedDelta = value;
 }
 
-void optionGreeksModel::setVegaAdjustedDelta(double value) const
+void optionGreeksModel::setVegaAdjustedDelta(const double& value) const
 {
     _vegaAdjustedDelta = value;
 }
 
-void optionGreeksModel::setThetaAdjustedDelta(double value) const
+void optionGreeksModel::setThetaAdjustedDelta(const double& value) const
 {
     _thetaAdjustedDelta = value;
 }
 
-void optionGreeksModel::setGammaVegaAdjustedDelta(double value) const
+void optionGreeksModel::setGammaVegaAdjustedDelta(const double& value) const
 {
     _gammaVegaAdjustedDelta = value;
 }

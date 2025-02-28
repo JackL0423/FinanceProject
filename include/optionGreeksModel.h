@@ -12,25 +12,25 @@ class optionGreeksModel : public virtual blackScholesModel, public optionGreeks
         optionGreeksModel(double underlyingPrice, double strikePrice, double timeToExperation, double riskFreeRate, double volatility);
 
         // TODO: #8 Fix set functions to intake const double& value
-        void setOptionPriceIV(double value) const;
+        void setOptionPriceIV(const double& value) const;
 
-        void setOptionPriceGamma(double value) const;
+        void setOptionPriceGamma(const double& value) const;
 
-        void setOptionPriceVega(double value) const;
+        void setOptionPriceVega(const double& value) const;
 
-        void setOptionPriceTheta(double value) const;
+        void setOptionPriceTheta(const double& value) const;
 
-        void setOptionPriceGammaVega(double value) const;
+        void setOptionPriceGammaVega(const double& value) const;
 
-        void setIVAdjustedDelta(double value) const;
+        void setIVAdjustedDelta(const double& value) const;
 
-        void setGammaAdjustedDelta(double value) const;
+        void setGammaAdjustedDelta(const double& value) const;
 
-        void setVegaAdjustedDelta(double value) const;
+        void setVegaAdjustedDelta(const double& value) const;
 
-        void setThetaAdjustedDelta(double value) const;
+        void setThetaAdjustedDelta(const double& value) const;
 
-        void setGammaVegaAdjustedDelta(double value) const;
+        void setGammaVegaAdjustedDelta(const double& value) const;
 
         const double& getOptionPriceIV() const;
 
