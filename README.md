@@ -37,7 +37,7 @@ FinanceProject is a financial modeling application that includes implementations
 
 1. Navigate to the project directory:
     ```sh
-    cd /Users/jacklight/FinanceProject
+    cd FinanceProject
     ```
 
 2. Create a build directory and navigate into it:
@@ -60,7 +60,7 @@ FinanceProject is a financial modeling application that includes implementations
 
 1. Navigate to the [Testing](http://_vscodecontentref_/16) directory:
     ```sh
-    cd /Users/jacklight/FinanceProject/Testing
+    cd FinanceProject/Testing
     ```
 
 2. Create a build directory and navigate into it:
