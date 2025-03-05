@@ -216,22 +216,19 @@ const double& blackScholesModel::getK() const { return _K; }
 /// @brief N(x) in Black-Scholes eq.
 /// @param d 
 /// @return cumilative distribution of d.
-double blackScholesModel::normalCDF(double d) const
+const double blackScholesModel::normalCDF(const double& d) const
 {
-    double L = abs(d);
-    double K = getK();
+    double z = abs(d);
+    double K = 0.21893;
 
-    double denominator = 0.0;
-    const double coefficients[2] = {0.0, 0.1};
-
-    for (int i=0; i < 5; i++)
+    if (isnan(d) || isnan(K))
     {
-        denominator += coefficients[i] * pow(K, i+1);
+        return nan("");
     }
+    double y = 0.125+3.611*tanh(0.043+0.2624*z) - 4.658*tanh(-1.687-0.519*z) + 4.982*tanh(-1.654+0.05044*z);
+    double denominator = 1.0 + exp(-y);
 
-    denominator *= sqrt(2 * 3.1415) * exp(-L * L / 2.0);
+    double result = 1.0 / denominator;
 
-    double result = 1.0 - 1.0 / denominator;
-
-    return d < 0 ? 1.0 - result : 1.0;
+    return d < 0 ? 1.0 - result : result;
 }

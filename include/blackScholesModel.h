@@ -156,7 +156,7 @@ class blackScholesModel
 
     double calculateOptionPrice();
 
-    double normalCDF(double d) const;
+    const double normalCDF(const double& d) const;
 
 
     void setUnderlyingPrice(const double& value);
