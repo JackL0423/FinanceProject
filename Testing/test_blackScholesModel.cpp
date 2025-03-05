@@ -101,6 +101,7 @@ TEST_F(blackScholesModelTest, calculateKTest1)
 {
     double expectedK = 1.0 / (1.0 + 0.2316419 * abs(a.getD1()));
     EXPECT_NEAR(a.getK(), expectedK, 1e-6);
+    cout << "K: " << a.getK() << endl;
 }
 
 TEST_F(blackScholesModelTest, calculateKTest2)
@@ -113,3 +114,23 @@ TEST_F(blackScholesModelTest, calculateKTest3)
 {
     EXPECT_TRUE(isnan(c.getK()));
 }
+
+TEST_F(blackScholesModelTest, normalCDFTestLargePositiveValue)
+{
+    double value = 10.0;
+    double expectedNormalCDF = 1.0; // Should be very close to 1
+    EXPECT_NEAR(a.normalCDF(value), expectedNormalCDF, 1e-6);
+}
+
+TEST_F(blackScholesModelTest, normalCDFTest2)
+{
+    double value = -10.0;
+    double expectedNormalCDF = 0.0;
+    EXPECT_NEAR(b.normalCDF(value), expectedNormalCDF, 1e-6);
+}
+
+TEST_F(blackScholesModelTest, normalCDFTestDefault)
+{
+    EXPECT_TRUE(isnan(c.normalCDF(nan(""))));
+}
+
