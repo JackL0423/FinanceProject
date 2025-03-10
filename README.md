@@ -60,7 +60,8 @@ FinanceProject is a financial modeling application that includes implementations
 
 1. Navigate to the [Testing](http://_vscodecontentref_/16) directory:
     ```sh
-    cd FinanceProject/Testing
+    cd make
+    FinanceProject/Testing
     ```
 
 2. Create a build directory and navigate into it:
