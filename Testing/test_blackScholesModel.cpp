@@ -122,10 +122,24 @@ TEST_F(blackScholesModelTest, normalCDFTestLargePositiveValue)
     EXPECT_NEAR(a.normalCDF(value), expectedNormalCDF, 1e-6);
 }
 
-TEST_F(blackScholesModelTest, normalCDFTest2)
+TEST_F(blackScholesModelTest, normalCDFTestLargeNegativeValue)
 {
     double value = -10.0;
     double expectedNormalCDF = 0.0;
+    EXPECT_NEAR(b.normalCDF(value), expectedNormalCDF, 1e-6);
+}
+
+TEST_F(blackScholesModelTest, normalCDFTestPositiveValue)
+{
+    double value = 1.0;
+    double expectedNormalCDF = 0.841344746;
+    EXPECT_NEAR(a.normalCDF(value), expectedNormalCDF, 1e-6);
+}
+
+TEST_F(blackScholesModelTest, normalCDFTestNegativeValue)
+{
+    double value = -1.0;
+    double expectedNormalCDF = 0.158655254;
     EXPECT_NEAR(b.normalCDF(value), expectedNormalCDF, 1e-6);
 }
 
