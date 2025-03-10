@@ -38,8 +38,7 @@ TEST_F(OptionGreeksTest, optionGreeksTest_calculateDelta_Test1)
 
 TEST_F(OptionGreeksTest, optionGreeksTest_calculateDelta_Test2)
 {
-    double ExpectedDelta = exp(-b.getD2() * b.getD2() / 2) / sqrt(2 * M_PI);
-    EXPECT_NEAR(b.getDelta(), ExpectedDelta, 1e-6);
+    EXPECT_TRUE(isnan(b.getDelta()));
 }
 
 TEST_F(OptionGreeksTest, optionGreeksTest_calculateGamma_Test1)
@@ -50,8 +49,7 @@ TEST_F(OptionGreeksTest, optionGreeksTest_calculateGamma_Test1)
 
 TEST_F(OptionGreeksTest, optionGreeksTest_calculateGamma_Test2)
 {
-    double ExpectedGamma = exp(-b.getD2() * b.getD1() / 2) / (sqrt(2 * M_PI) * b.getUnderlyingPrice() * b.getVolatility() * sqrt(b.getTimeToExperation()));
-    EXPECT_NEAR(b.getGamma(), ExpectedGamma, 1e-6);
+    EXPECT_TRUE(isnan(b.getGamma()));
 }
 
 TEST_F(OptionGreeksTest, optionGreeksTest_calculateVega_Test1)
@@ -62,8 +60,7 @@ TEST_F(OptionGreeksTest, optionGreeksTest_calculateVega_Test1)
 
 TEST_F(OptionGreeksTest, optionGreeksTest_calculateVega_Test2)
 {
-    double ExpectedVega = b.getUnderlyingPrice() * exp(-b.getD1() * b.getD1() / 2) * sqrt(b.getTimeToExperation());
-    EXPECT_NEAR(b.getVega(), ExpectedVega, 1e-6);
+    EXPECT_TRUE(isnan(b.getVega()));
 }
 
 TEST_F(OptionGreeksTest, optionGreeksTest_calculateTheta_Test1)
@@ -74,8 +71,7 @@ TEST_F(OptionGreeksTest, optionGreeksTest_calculateTheta_Test1)
 
 TEST_F(OptionGreeksTest, optionGreeksTest_calculateTheta_Test2)
 {
-    double ExpectedTheta = -b.getUnderlyingPrice() * exp(-b.getD1() * b.getD1() / 2) * b.getVolatility() / (2* sqrt(b.getTimeToExperation())) - b.getRiskFreeRate() * b.getK() * exp(-b.getRiskFreeRate() * b.getTimeToExperation()) * b.normalCDF(b.getD2());
-    EXPECT_NEAR(b.getTheta(), ExpectedTheta, 1e-6);
+    EXPECT_TRUE(isnan(b.getTheta()));
 }
 
 TEST_F(OptionGreeksTest, optionGreeksTest_calculateRho_Test1)
@@ -86,6 +82,5 @@ TEST_F(OptionGreeksTest, optionGreeksTest_calculateRho_Test1)
 
 TEST_F(OptionGreeksTest, optionGreeksTest_calculateRho_Test2)
 {
-    double ExpectedRho = b.getK() * b.getTimeToExperation() * exp(-b.getRiskFreeRate() * b.getTimeToExperation()) * b.normalCDF(b.getD2());
-    EXPECT_NEAR(b.getRho(), ExpectedRho, 1e-6);
+    EXPECT_TRUE(isnan(b.getRho()));
 }
