@@ -106,7 +106,7 @@ void optionGreeksModel::calculateOptionPriceIV(const double& impliedVolatility) 
 {
     double delta = getIVAdjustedDelta();
 
-    // TODO: #1 write overloaded function for calculateD1(imlpiedVolatility)
+    calculateD1(impliedVolatility);
     double d1 = getD1();
     double d2 = d1 - (impliedVolatility * sqrt(getTimeToExperation())); // Make into overloaded func.
 
@@ -180,4 +180,13 @@ void optionGreeksModel::calculateGammaVegaAdjustedDelta() const
     double gammaVegaAdjustedDelta = getDelta() + (0.5 * getGamma()) + getVega();
 
     setGammaVegaAdjustedDelta(gammaVegaAdjustedDelta);
+}
+
+void optionGreeksModel::calculateD1(double impliedVolatility) const
+{
+    double numerator = log(getUnderlyingPrice()/getStrikePrice()) + (getRiskFreeRate() + 0.5 * impliedVolatility * impliedVolatility) * getTimeToExperation();
+    double denominator = impliedVolatility * sqrt(getTimeToExperation());
+    
+    double d1 = numerator / denominator;
+    setD1(d1);
 }
