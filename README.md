@@ -1,6 +1,7 @@
 # FinanceProject
 
 ## Overview
+
 FinanceProject is a financial modeling application that includes implementations of the Black-Scholes model and option Greeks calculations. The project is designed to provide tools for pricing European options and calculating the sensitivities of these options to various factors.
 
 ## Project Structure
@@ -36,22 +37,26 @@ FinanceProject is a financial modeling application that includes implementations
 ### Building the Project
 
 1. Navigate to the project directory:
+
     ```sh
     cd FinanceProject
     ```
 
 2. Create a build directory and navigate into it:
+
     ```sh
     mkdir build
     cd build
     ```
 
 3. Run CMake to generate the build system:
+
     ```sh
     cmake ..
     ```
 
 4. Use `make` to compile the project:
+
     ```sh
     make
     ```
@@ -59,28 +64,33 @@ FinanceProject is a financial modeling application that includes implementations
 ### Running Tests
 
 1. Navigate to the [Testing](http://_vscodecontentref_/16) directory:
+
     ```sh
     cd make
     FinanceProject/Testing
     ```
 
 2. Create a build directory and navigate into it:
+
     ```sh
     mkdir build
     cd build
     ```
 
 3. Run CMake to generate the build system for tests:
+
     ```sh
     cmake ..
     ```
 
 4. Use `make` to compile the tests:
+
     ```sh
     make
     ```
 
 5. Run the tests:
+
     ```sh
     ./ModelTests
     ```
