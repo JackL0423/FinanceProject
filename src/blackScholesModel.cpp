@@ -219,16 +219,21 @@ const double& blackScholesModel::getK() const { return _K; }
 const double blackScholesModel::normalCDF(const double& d) const
 {
     double z = abs(d);
-    double K = 0.21893;
+    double K = 1.0 / (1.0 + 0.2316419 * z);
 
-    if (isnan(d) || isnan(K))
+    if (isnan(d))
     {
         return nan("");
     }
-    double y = 0.125+3.611*tanh(0.043+0.2624*z) - 4.658*tanh(-1.687-0.519*z) + 4.982*tanh(-1.654+0.05044*z);
-    double denominator = 1.0 + exp(-y);
 
-    double result = 1.0 / denominator;
+    double a1 = 0.319381530;
+    double a2 = -0.356563782;
+    double a3 = 1.781477937;
+    double a4 = -1.821255978;
+    double a5 = 1.330274429;
 
-    return d < 0 ? 1.0 - result : result;
+    double y = 1.0 - (1.0 / sqrt(2 * M_PI)) * exp(-0.5 * z * z) * 
+               (a1 * K + a2 * K * K + a3 * K * K * K + a4 * K * K * K * K + a5 * K * K * K * K * K);
+
+    return d < 0 ? 1.0 - y : y;
 }
