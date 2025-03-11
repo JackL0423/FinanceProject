@@ -23,15 +23,32 @@ double hestonModel::calculateOptionPrice() const
     const std::complex<double> i(0, 1);
 
     // Define the characteristic function
+    const auto alpha = [&](std::complex<double> u) -> std::complex<double> {
+        return -u * u * 0.5 - i * u * getKappa() * getTheta();
+    };
+
+    const auto beta = [&](std::complex<double> u) -> std::complex<double> {
+        return getKappa() - getRho() * getSigma() * i * u;
+    };
+
+    const auto gamma = [&](std::complex<double> u) -> std::complex<double> {
+        return getSigma() * getSigma() * 0.5;
+    };
+
+    const auto D = [&](std::complex<double> u) -> std::complex<double> {
+        return std::sqrt(beta(u) * beta(u) - 4.0 * alpha(u) * gamma(u));
+    };
+
+    const auto G = [&](std::complex<double> u) -> std::complex<double> {
+        return (beta(u) - D(u)) / (beta(u) + D(u));
+    };
+
+    const auto C = [&](std::complex<double> u) -> std::complex<double> {
+        return getKappa() * (getTheta() * getTimeToExperation() * (beta(u) - D(u)) - 2.0 * std::log((1.0 - G(u) * std::exp(-D(u) * getTimeToExperation())) / (1.0 - G(u))));
+    };
+
     const auto characteristicFunction = [&](std::complex<double> u) -> std::complex<double> {
-        std::complex<double> alpha = -u * u * 0.5 - i * u * getKappa() * getTheta();
-        std::complex<double> beta = getKappa() - getRho() * getSigma() * i * u;
-        std::complex<double> gamma = getSigma() * getSigma() * 0.5;
-        std::complex<double> D = std::sqrt(beta * beta - 4.0 * alpha * gamma);
-        std::complex<double> G = (beta - D) / (beta + D);
-        std::complex<double> C = getKappa() * (getTheta() * getTimeToExperation() * (beta - D) - 2.0 * std::log((1.0 - G * std::exp(-D * getTimeToExperation())) / (1.0 - G)));
-        std::complex<double> A = std::exp(C + getV0() * (beta - D) * (1.0 - std::exp(-D * getTimeToExperation())) / (1.0 - G * std::exp(-D * getTimeToExperation())));
-        return A;
+        return std::exp(C(u) + getV0() * (beta(u) - D(u)) * (1.0 - std::exp(-D(u) * getTimeToExperation())) / (1.0 - G(u) * std::exp(-D(u) * getTimeToExperation())));
     };
 
     // Integrate using the trapezoidal rule
