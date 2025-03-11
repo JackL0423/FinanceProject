@@ -35,11 +35,11 @@ class hestonModel : public optionGreeksModel
 
     
         private:
-            mutable double _v0;
-            mutable double _kappa;
-            mutable double _theta;
-            mutable double _sigma;
-            mutable double _rho;
+            mutable double _v0;     // initial volatility
+            mutable double _kappa;  // rate at which v_t reverts to theta
+            mutable double _theta;  // long variance / long-run average variance of the price
+            mutable double _sigma;  // volatility of volatility
+            mutable double _rho;    // correlation of the two wiener processes
 
 };
 
