@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.27)
 
 
-set(CXX_STANDARD CXX 23)
-set(CMAKE_CXX_STANDARD_REQUIRED OFF)
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 project(ModelTests)
 
@@ -15,15 +15,17 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
-# TODO: #6 [feature] Update executables and libraries in Testing CMakeLists.txt
-
-add_executable(${PROJECT_NAME} test_blackScholesModel.cpp test_optionGreeks.cpp)
+add_executable(${PROJECT_NAME} test_blackScholesModel.cpp test_optionGreeks.cpp test_optionGreeksModel.cpp test_hestonModel.cpp)
 
 add_library(ScholesModel ../include/blackScholesModel.h ../src/blackScholesModel.cpp)
 
 add_library(optionGreeks ../include/optionGreeks.h ../src/optionGreeks.cpp)
 
-target_link_libraries(${PROJECT_NAME} ScholesModel optionGreeks GTest::gtest_main)
+add_library(optionGreeksModel ../include/optionGreeksModel.h ../src/optionGreeksModel.cpp)
+
+add_library(hestonModel ../include/hestonModel.h ../src/hestonModel.cpp)
+
+target_link_libraries(${PROJECT_NAME} ScholesModel optionGreeks optionGreeksModel hestonModel GTest::gtest_main)
 
 include(GoogleTest)
 
