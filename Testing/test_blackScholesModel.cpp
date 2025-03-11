@@ -101,7 +101,6 @@ TEST_F(blackScholesModelTest, calculateKTest1)
 {
     double expectedK = 1.0 / (1.0 + 0.2316419 * abs(a.getD1()));
     EXPECT_NEAR(a.getK(), expectedK, 1e-6);
-    cout << "K: " << a.getK() << endl;
 }
 
 TEST_F(blackScholesModelTest, calculateKTest2)
