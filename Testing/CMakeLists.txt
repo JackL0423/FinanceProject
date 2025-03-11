@@ -1,11 +1,12 @@
 cmake_minimum_required(VERSION 3.27)
 
+project(ModelTests)
 
+# Set the C++ standard
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-project(ModelTests)
-
+# Include GoogleTest
 include(FetchContent)
 FetchContent_Declare(
     googletest
@@ -13,21 +14,45 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(googletest)
 
+# Enable testing
 enable_testing()
 
-add_executable(${PROJECT_NAME} test_blackScholesModel.cpp test_optionGreeks.cpp test_optionGreeksModel.cpp test_hestonModel.cpp)
+# Add libraries
+add_library(ScholesModel ../src/blackScholesModel.cpp)
+add_library(optionGreeks ../src/optionGreeks.cpp)
+add_library(optionGreeksModel ../src/optionGreeksModel.cpp)
+add_library(hestonModel ../src/hestonModel.cpp)
 
-add_library(ScholesModel ../include/blackScholesModel.h ../src/blackScholesModel.cpp)
+# Set include directories for libraries
+target_include_directories(ScholesModel PUBLIC ../include)
+target_include_directories(optionGreeks PUBLIC ../include)
+target_include_directories(optionGreeksModel PUBLIC ../include)
+target_include_directories(hestonModel PUBLIC ../include)
 
-add_library(optionGreeks ../include/optionGreeks.h ../src/optionGreeks.cpp)
+# Set C++ standard for libraries
+target_compile_features(ScholesModel PUBLIC cxx_std_23)
+target_compile_features(optionGreeks PUBLIC cxx_std_23)
+target_compile_features(optionGreeksModel PUBLIC cxx_std_23)
+target_compile_features(hestonModel PUBLIC cxx_std_23)
 
-add_library(optionGreeksModel ../include/optionGreeksModel.h ../src/optionGreeksModel.cpp)
+# Add the test executable
+add_executable(${PROJECT_NAME}
+    test_blackScholesModel.cpp
+    test_optionGreeks.cpp
+    test_optionGreeksModel.cpp
+    test_hestonModel.cpp
+)
 
-add_library(hestonModel ../include/hestonModel.h ../src/hestonModel.cpp)
+# Link libraries to the test executable
+target_link_libraries(${PROJECT_NAME}
+    ScholesModel
+    optionGreeks
+    optionGreeksModel
+    hestonModel
+    GTest::gtest_main
+)
 
-target_link_libraries(${PROJECT_NAME} ScholesModel optionGreeks optionGreeksModel hestonModel GTest::gtest_main)
-
+# Discover tests
 include(GoogleTest)
-
 gtest_discover_tests(${PROJECT_NAME})
 
