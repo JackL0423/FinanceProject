@@ -1,6 +1,6 @@
 #include "../include/optionGreeks.h"
 
-optionGreeks::optionGreeks()
+optionGreeks::optionGreeks() : blackScholesModel()
 {
     calculateDelta();
     calculateGamma();
@@ -34,7 +34,7 @@ void optionGreeks::calculateDelta()
 
 void optionGreeks::calculateGamma()
 {
-    if (isnan(getD1()) || isnan(getD2()))
+    if (isnan(getD1()) || isnan(getD2()) || isnan(getUnderlyingPrice()) || isnan(getVolatility()) || isnan(getTimeToExperation()))
     {
         setGamma(nan(""));
         return;
@@ -46,7 +46,7 @@ void optionGreeks::calculateGamma()
 
 void optionGreeks::calculateVega()
 {
-    if (isnan(getD1()))
+    if (isnan(getD1()) || isnan(getUnderlyingPrice()) || isnan(getTimeToExperation()))
     {
         setVega(nan(""));
         return;
@@ -58,7 +58,7 @@ void optionGreeks::calculateVega()
 
 void optionGreeks::calculateTheta()
 {
-    if (isnan(getD1()) || isnan(getD2()))
+    if (isnan(getD1()) || isnan(getD2()) || isnan(getK()) || isnan(getUnderlyingPrice()) || isnan(getVolatility()) || isnan(getTimeToExperation()) || isnan(getRiskFreeRate())) 
     {
         setTheta(nan(""));
         return;
@@ -70,7 +70,7 @@ void optionGreeks::calculateTheta()
 
 void optionGreeks::calculateRho()
 {
-    if (isnan(getD2()) || isnan(getK()))
+    if (isnan(getD2()) || isnan(getK()) || isnan(getRiskFreeRate()) || isnan(getTimeToExperation()))
     {
         setRho(nan(""));
         return;
