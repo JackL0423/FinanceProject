@@ -8,6 +8,11 @@ using namespace std;
 /// @brief calculates and sets the d1 value in the Black-Scholes model. 
 void blackScholesModel::calculateD1()
 {
+    if (isnan(getUnderlyingPrice()) || isnan(getStrikePrice()) || isnan(getRiskFreeRate()) || isnan(getVolatility()) || isnan(getTimeToExperation()))
+    {
+        setD1(nan(""));
+        return;
+    }
     double numerator = log(getUnderlyingPrice()/getStrikePrice()) + (getRiskFreeRate() + 0.5 * getVolatility() * getVolatility()) * getTimeToExperation();
     double denominator = getVolatility() * sqrt(getTimeToExperation());
     
@@ -19,6 +24,11 @@ void blackScholesModel::calculateD1()
 /// @brief calculates and sets the d2 value in the Black-Scholes model.
 void blackScholesModel::calculateD2()
 {
+    if (isnan(getD1()) || isnan(getVolatility()) || isnan(getTimeToExperation()))
+    {
+        setD2(nan(""));
+        return;
+    }
     double d2 = getD1() - getVolatility() * sqrt(getTimeToExperation());
 
     setD2(d2);
@@ -49,6 +59,11 @@ double blackScholesModel::calculateOptionPrice()
 /// @brief calculates and sets the K value in the Black-Scholes model.
 void blackScholesModel::calculateK()
 {
+    if (isnan(getD1()))
+    {
+        setK(nan(""));
+        return;
+    }
     double K = 1.0 / (1.0 + 0.2316419 * abs(getD1()));
 
     setK(K);
@@ -59,15 +74,15 @@ void blackScholesModel::calculateK()
 blackScholesModel::blackScholesModel()
 {
     //  TODO: #3 [refactoring] Look at default values for scholes model. May be better to set all default as NaN and do checks.
-    setUnderlyingPrice(0.0);
-    setStrikePrice(0.0);
-    setTimeToExperation(0.0);
-    setRiskFreeRate(0.0);
-    setVolatility(0.0);
+    setUnderlyingPrice(nan(""));
+    setStrikePrice(nan(""));
+    setTimeToExperation(nan(""));
+    setRiskFreeRate(nan(""));
+    setVolatility(nan(""));
     //setOptionType(OptionType::CALL);
-    setD1(nan(""));
-    setD2(nan(""));
-    setK(nan(""));
+    calculateD1();
+    calculateD2();
+    calculateK();
 }
 
 
