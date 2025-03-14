@@ -23,11 +23,16 @@ TEST_F(OptionGreeksTest, optionGreeksTest_constructor_Test1)
 
 TEST_F(OptionGreeksTest, optionGreeksTest_constructor_Test2)
 {
-    EXPECT_EQ(b.getUnderlyingPrice(), 0.0);
-    EXPECT_EQ(b.getStrikePrice(), 0.0);
-    EXPECT_EQ(b.getTimeToExperation(), 0.0);
-    EXPECT_EQ(b.getRiskFreeRate(), 0.0);
-    EXPECT_EQ(b.getVolatility(), 0.0);
+    EXPECT_TRUE(isnan(b.getUnderlyingPrice()));
+    EXPECT_TRUE(isnan(b.getStrikePrice()));
+    EXPECT_TRUE(isnan(b.getTimeToExperation()));
+    EXPECT_TRUE(isnan(b.getRiskFreeRate()));
+    EXPECT_TRUE(isnan(b.getVolatility()));
+    EXPECT_TRUE(isnan(b.getDelta()));
+    EXPECT_TRUE(isnan(b.getGamma()));
+    EXPECT_TRUE(isnan(b.getVega()));
+    EXPECT_TRUE(isnan(b.getTheta()));
+    EXPECT_TRUE(isnan(b.getRho()));
 }
 
 TEST_F(OptionGreeksTest, optionGreeksTest_calculateDelta_Test1)
