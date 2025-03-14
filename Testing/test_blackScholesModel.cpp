@@ -38,11 +38,11 @@ TEST_F(blackScholesModelTest, blackScholesModelTest_constructor_Test2)
 
 TEST_F(blackScholesModelTest, blackScholesModelTest_constructor_Test3)
 {
-    EXPECT_EQ(c.getUnderlyingPrice(), 0.0);
-    EXPECT_EQ(c.getStrikePrice(), 0.0);
-    EXPECT_EQ(c.getTimeToExperation(), 0.0);
-    EXPECT_EQ(c.getRiskFreeRate(), 0.0);
-    EXPECT_EQ(c.getVolatility(), 0.0);
+    EXPECT_TRUE(isnan(c.getUnderlyingPrice()));
+    EXPECT_TRUE(isnan(c.getStrikePrice()));
+    EXPECT_TRUE(isnan(c.getTimeToExperation()));
+    EXPECT_TRUE(isnan(c.getRiskFreeRate()));
+    EXPECT_TRUE(isnan(c.getVolatility()));
     EXPECT_EQ(c.getOptionType(), blackScholesModel::OptionType::CALL);
 }
 
