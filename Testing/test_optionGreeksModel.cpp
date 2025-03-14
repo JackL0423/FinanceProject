@@ -12,22 +12,21 @@ class optionGreeksModelTest : public testing::Test
 
 TEST_F(optionGreeksModelTest, DefaultConstructor)
 {
-    EXPECT_DOUBLE_EQ(model.getOptionPriceIV(), 0.0);
-    EXPECT_DOUBLE_EQ(model.getOptionPriceGamma(), 0.0);
-    EXPECT_DOUBLE_EQ(model.getOptionPriceVega(), 0.0);
-    EXPECT_DOUBLE_EQ(model.getOptionPriceTheta(), 0.0);
-    EXPECT_DOUBLE_EQ(model.getOptionPriceGammaVega(), 0.0);
-    EXPECT_DOUBLE_EQ(model.getIVAdjustedDelta(), 0.0);
-    EXPECT_DOUBLE_EQ(model.getGammaAdjustedDelta(), 0.0);
-    EXPECT_DOUBLE_EQ(model.getVegaAdjustedDelta(), 0.0);
-    EXPECT_DOUBLE_EQ(model.getThetaAdjustedDelta(), 0.0);
-    EXPECT_DOUBLE_EQ(model.getGammaVegaAdjustedDelta(), 0.0);
+    EXPECT_TRUE(isnan(model.getUnderlyingPrice()));
+    EXPECT_TRUE(isnan(model.getStrikePrice()));
+    EXPECT_TRUE(isnan(model.getTimeToExperation()));
+    EXPECT_TRUE(isnan(model.getRiskFreeRate()));
+    EXPECT_TRUE(isnan(model.getVolatility()));
 }
 
 TEST_F(optionGreeksModelTest, ParameterizedConstructor)
 {
     optionGreeksModel paramModel(100.0, 100.0, 1.0, 0.05, 0.2);
-    // Add assertions to check if the parameters are correctly initialized
+    EXPECT_DOUBLE_EQ(paramModel.getUnderlyingPrice(), 100.0);
+    EXPECT_DOUBLE_EQ(paramModel.getStrikePrice(), 100.0);
+    EXPECT_DOUBLE_EQ(paramModel.getTimeToExperation(), 1.0);
+    EXPECT_DOUBLE_EQ(paramModel.getRiskFreeRate(), 0.05);
+    EXPECT_DOUBLE_EQ(paramModel.getVolatility(), 0.2);
 }
 
 TEST_F(optionGreeksModelTest, SetOptionPriceIV)
@@ -90,4 +89,62 @@ TEST_F(optionGreeksModelTest, SetGammaVegaAdjustedDelta)
     EXPECT_DOUBLE_EQ(model.getGammaVegaAdjustedDelta(), 10.12);
 }
 
-// TODO: #10 [testing] Add tests for the calculate functions in optionGreeksModel
+TEST_F(optionGreeksModelTest, CalculateOptionPriceIV)
+{
+    model.calculateOptionPriceIV(0.2);
+    // Add assertions to check if the option price IV is correctly calculated
+}
+
+TEST_F(optionGreeksModelTest, CalculateOptionPriceGamma)
+{
+    model.calculateOptionPriceGamma();
+    // Add assertions to check if the option price Gamma is correctly calculated
+}
+
+TEST_F(optionGreeksModelTest, CalculateOptionPriceVega)
+{
+    model.calculateOptionPriceVega();
+    // Add assertions to check if the option price Vega is correctly calculated
+}
+
+TEST_F(optionGreeksModelTest, CalculateOptionPriceTheta)
+{
+    model.calculateOptionPriceTheta();
+    // Add assertions to check if the option price Theta is correctly calculated
+}
+
+TEST_F(optionGreeksModelTest, CalculateOptionPriceGammaVega)
+{
+    model.calculateOptionPriceGammaVega();
+    // Add assertions to check if the option price Gamma Vega is correctly calculated
+}
+
+TEST_F(optionGreeksModelTest, CalculateIVAdjustedDelta)
+{
+    model.calculateIVAdjustedDelta(0.2);
+    // Add assertions to check if the IV adjusted delta is correctly calculated
+}
+
+TEST_F(optionGreeksModelTest, CalculateGammaAdjustedDelta)
+{
+    model.calculateGammaAdjustedDelta();
+    // Add assertions to check if the Gamma adjusted delta is correctly calculated
+}
+
+TEST_F(optionGreeksModelTest, CalculateVegaAdjustedDelta)
+{
+    model.calculateVegaAdjustedDelta();
+    // Add assertions to check if the Vega adjusted delta is correctly calculated
+}
+
+TEST_F(optionGreeksModelTest, CalculateThetaAdjustedDelta)
+{
+    model.calculateThetaAdjustedDelta();
+    // Add assertions to check if the Theta adjusted delta is correctly calculated
+}
+
+TEST_F(optionGreeksModelTest, CalculateGammaVegaAdjustedDelta)
+{
+    model.calculateGammaVegaAdjustedDelta();
+    // Add assertions to check if the Gamma Vega adjusted delta is correctly calculated
+}
