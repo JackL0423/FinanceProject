@@ -11,7 +11,6 @@ class optionGreeksModel : public virtual blackScholesModel, public optionGreeks
 
         optionGreeksModel(double underlyingPrice, double strikePrice, double timeToExperation, double riskFreeRate, double volatility);
 
-        // TODO: #8 Fix set functions to intake const double& value
         void setOptionPriceIV(const double& value) const;
 
         void setOptionPriceGamma(const double& value) const;
