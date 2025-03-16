@@ -1,34 +1,36 @@
 #include "../include/optionGreeksModel.h"
+#include <stdexcept>
+#include <iostream>
 
-optionGreeksModel::optionGreeksModel() : optionGreeks(0.0, 0.0, 0.0, 0.0, 0.0)
+optionGreeksModel::optionGreeksModel()
 {
-    setOptionPriceIV(0.0);
-    setOptionPriceGamma(0.0);
-    setOptionPriceVega(0.0);
-    setOptionPriceTheta(0.0);
-    setOptionPriceGammaVega(0.0);
-    setIVAdjustedDelta(0.0);
-    setGammaAdjustedDelta(0.0);
-    setVegaAdjustedDelta(0.0);
-    setThetaAdjustedDelta(0.0);
-    setGammaVegaAdjustedDelta(0.0);
-
+    calculateOptionPriceIV(0.0);
+    calculateOptionPriceGamma();
+    calculateOptionPriceVega();
+    calculateOptionPriceTheta();
+    calculateOptionPriceGammaVega();
+    calculateIVAdjustedDelta(0.0);
+    calculateGammaAdjustedDelta();
+    calculateVegaAdjustedDelta();
+    calculateThetaAdjustedDelta();
+    calculateGammaVegaAdjustedDelta();
 }
 
 optionGreeksModel::optionGreeksModel(double underlyingPrice, double strikePrice, double timeToExperation, double riskFreeRate, double volatility)
-    : optionGreeks(underlyingPrice, strikePrice, timeToExperation, riskFreeRate, volatility)
+    : optionGreeks(underlyingPrice, strikePrice, timeToExperation, riskFreeRate, volatility), blackScholesModel(underlyingPrice, strikePrice, timeToExperation, riskFreeRate, volatility) 
 {
     // TODO: #4 [enhancement] Initialize the optionGreeksModel with given parameters
-    setOptionPriceIV(0.0);
-    setOptionPriceGamma(0.0);
-    setOptionPriceVega(0.0);
-    setOptionPriceTheta(0.0);
-    setOptionPriceGammaVega(0.0);
-    setIVAdjustedDelta(0.0);
-    setGammaAdjustedDelta(0.0);
-    setVegaAdjustedDelta(0.0);
-    setThetaAdjustedDelta(0.0);
-    setGammaVegaAdjustedDelta(0.0);
+    //  Get rid of the parameters volatility to use implied volatility
+    calculateOptionPriceIV(volatility);
+    calculateOptionPriceGamma();
+    calculateOptionPriceVega();
+    calculateOptionPriceTheta();
+    calculateOptionPriceGammaVega();
+    calculateIVAdjustedDelta(volatility);
+    calculateGammaAdjustedDelta();
+    calculateVegaAdjustedDelta();
+    calculateThetaAdjustedDelta();
+    calculateGammaVegaAdjustedDelta();
 }
 
 void optionGreeksModel::setOptionPriceIV(const double& value) const
@@ -104,89 +106,234 @@ const double& optionGreeksModel::getGammaVegaAdjustedDelta() const { return _gam
     
 void optionGreeksModel::calculateOptionPriceIV(const double& impliedVolatility) const
 {
-    double delta = getIVAdjustedDelta();
+    try
+    {
+        if (isnan(getD1()) || isnan(getUnderlyingPrice()) || isnan(getStrikePrice()) || isnan(getRiskFreeRate()) || isnan(getTimeToExperation()))
+        {
+            throw std::invalid_argument("Invalid input: NaN value detected");
+        }
 
-    calculateD1(impliedVolatility);
-    double d1 = getD1();
-    double d2 = d1 - (impliedVolatility * sqrt(getTimeToExperation())); // Make into overloaded func.
+        double delta = getIVAdjustedDelta();
 
-    double optionPriceIV = (delta * getUnderlyingPrice() * normalCDF(d1)) 
-                            - (getStrikePrice() * exp(-getRiskFreeRate() * getTimeToExperation()) * normalCDF(d2));
+        calculateD1(impliedVolatility);
+        double d1 = getD1();
+        double d2 = d1 - (impliedVolatility * sqrt(getTimeToExperation()));
 
-    setOptionPriceIV(optionPriceIV);
+        double optionPriceIV = (delta * getUnderlyingPrice() * normalCDF(d1)) 
+                                - (getStrikePrice() * exp(-getRiskFreeRate() * getTimeToExperation()) * normalCDF(d2));
+
+        setOptionPriceIV(optionPriceIV);
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << "Error in calculateOptionPriceIV: " << e.what() << std::endl;
+        setOptionPriceIV(nan(""));
+    }
 }
 
 void optionGreeksModel::calculateOptionPriceGamma() const
 {
-    double discountedStrikePrice = getStrikePrice() * exp(-getRiskFreeRate() * getTimeToExperation());
-    double adjustedOptionPriceGamma = (getGammaAdjustedDelta() * getUnderlyingPrice()) - discountedStrikePrice;
+    try
+    {
+        if (isnan(getStrikePrice()) || isnan(getRiskFreeRate()) || isnan(getTimeToExperation()) || isnan(getUnderlyingPrice()) || isnan(getGammaAdjustedDelta()))
+        {
+            throw std::invalid_argument("Invalid input: NaN value detected");
+        }
 
-    setOptionPriceGamma(adjustedOptionPriceGamma);
+        double discountedStrikePrice = getStrikePrice() * exp(-getRiskFreeRate() * getTimeToExperation());
+        double adjustedOptionPriceGamma = (getGammaAdjustedDelta() * getUnderlyingPrice()) - discountedStrikePrice;
+
+        setOptionPriceGamma(adjustedOptionPriceGamma);
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << "Error in calculateOptionPriceGamma: " << e.what() << std::endl;
+        setOptionPriceGamma(nan(""));
+    }
 }
 
 void optionGreeksModel::calculateOptionPriceVega() const
 {
-    double optionPriceVega = getDelta() * getUnderlyingPrice() - getVega() * getVegaAdjustedDelta() + (0.5 * getVega() * getVega());
+    try
+    {
+        if (isnan(getDelta()) || isnan(getUnderlyingPrice()) || isnan(getVega()) || isnan(getVegaAdjustedDelta()))
+        {
+            throw std::invalid_argument("Invalid input: NaN value detected");
+        }
 
-    setOptionPriceVega(optionPriceVega);
+        double optionPriceVega = getDelta() * getUnderlyingPrice() - getVega() * getVegaAdjustedDelta() + (0.5 * getVega() * getVega());
+
+        setOptionPriceVega(optionPriceVega);
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << "Error in calculateOptionPriceVega: " << e.what() << std::endl;
+        setOptionPriceVega(nan(""));
+    }
 }
 
 void optionGreeksModel::calculateOptionPriceTheta() const
 {
-    double optionPriceTheta = getDelta() * getUnderlyingPrice() - getTheta() * getTimeToExperation() + getThetaAdjustedDelta() - (getStrikePrice() * exp(-getRiskFreeRate() * getTimeToExperation()));
+    try
+    {
+        if (isnan(getDelta()) || isnan(getUnderlyingPrice()) || isnan(getTheta()) || isnan(getThetaAdjustedDelta()) || isnan(getRiskFreeRate()) || isnan(getTimeToExperation()) || isnan(getStrikePrice()))
+        {
+            throw std::invalid_argument("Invalid input: NaN value detected");
+        }
 
-    setOptionPriceTheta(optionPriceTheta);
+        double optionPriceTheta = getDelta() * getUnderlyingPrice() - getTheta() * getTimeToExperation() + getThetaAdjustedDelta() - (getStrikePrice() * exp(-getRiskFreeRate() * getTimeToExperation()));
+
+        setOptionPriceTheta(optionPriceTheta);
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << "Error in calculateOptionPriceTheta: " << e.what() << std::endl;
+        setOptionPriceTheta(nan(""));
+    }
 }
 
 void optionGreeksModel::calculateOptionPriceGammaVega() const
 {
-    double optionPriceGammaVega = getGammaAdjustedDelta() * getUnderlyingPrice() + 0.5 * getGamma() * pow(getUnderlyingPrice(),2) - getVega() * (getUnderlyingPrice() * sqrt(getTimeToExperation()) * exp(-getRiskFreeRate() * getTimeToExperation()) / 100.0);
+    try
+    {
+        if (isnan(getGammaAdjustedDelta()) || isnan(getUnderlyingPrice()) || isnan(getGamma()) || isnan(getVega()) || isnan(getTimeToExperation()) || isnan(getRiskFreeRate()))
+        {
+            throw std::invalid_argument("Invalid input: NaN value detected");
+        }
 
-    setOptionPriceGammaVega(optionPriceGammaVega);
+        double optionPriceGammaVega = getGammaAdjustedDelta() * getUnderlyingPrice() + 0.5 * getGamma() * pow(getUnderlyingPrice(),2) - getVega() * (getUnderlyingPrice() * sqrt(getTimeToExperation()) * exp(-getRiskFreeRate() * getTimeToExperation()) / 100.0);
+
+        setOptionPriceGammaVega(optionPriceGammaVega);
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << "Error in calculateOptionPriceGammaVega: " << e.what() << std::endl;
+        setOptionPriceGammaVega(nan(""));
+    }
 }
 
 void optionGreeksModel::calculateIVAdjustedDelta(double impliedVolatility) const
 {
-    double d1 = getD1();
-    
-    double ivAdjustedDelta = normalCDF(d1);
+    try
+    {
+        if (isnan(getD1()))
+        {
+            throw std::invalid_argument("Invalid input: NaN value detected");
+        }
 
-    setIVAdjustedDelta(ivAdjustedDelta);
+        double d1 = getD1();
+        double ivAdjustedDelta = normalCDF(d1);
+
+        setIVAdjustedDelta(ivAdjustedDelta);
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << "Error in calculateIVAdjustedDelta: " << e.what() << std::endl;
+        setIVAdjustedDelta(nan(""));
+    }
 }
 
 void optionGreeksModel::calculateGammaAdjustedDelta() const
 {
-    double gammaAdjustedDelta = getDelta() + (0.5 * getGamma());
+    try
+    {
+        if (isnan(getD1()) || isnan(getGamma()))
+        {
+            throw std::invalid_argument("Invalid input: NaN value detected");
+        }
 
-    setGammaAdjustedDelta(gammaAdjustedDelta);
+        double gammaAdjustedDelta = getDelta() + (0.5 * getGamma());
+
+        setGammaAdjustedDelta(gammaAdjustedDelta);
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << "Error in calculateGammaAdjustedDelta: " << e.what() << std::endl;
+        setGammaAdjustedDelta(nan(""));
+    }
 }
 
 void optionGreeksModel::calculateVegaAdjustedDelta() const
 {
-    double vegaAdjustedDelta = getDelta() + getVega();
+    try
+    {
+        if (isnan(getDelta()) || isnan(getVega()))
+        {
+            throw std::invalid_argument("Invalid input: NaN value detected");
+        }
 
-    setVegaAdjustedDelta(vegaAdjustedDelta);
+        double vegaAdjustedDelta = getDelta() + getVega();
+
+        setVegaAdjustedDelta(vegaAdjustedDelta);
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << "Error in calculateVegaAdjustedDelta: " << e.what() << std::endl;
+        setVegaAdjustedDelta(nan(""));
+    }
 }
 
 void optionGreeksModel::calculateThetaAdjustedDelta() const
 {
-    double thetaAdjustedDelta = getDelta() - getTheta();
+    try
+    {
+        if (isnan(getDelta()) || isnan(getTheta()))
+        {
+            throw std::invalid_argument("Invalid input: NaN value detected");
+        }
 
-    setThetaAdjustedDelta(thetaAdjustedDelta);
+        double thetaAdjustedDelta = getDelta() - getTheta();
+
+        setThetaAdjustedDelta(thetaAdjustedDelta);
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << "Error in calculateThetaAdjustedDelta: " << e.what() << std::endl;
+        setThetaAdjustedDelta(nan(""));
+    }
 }
 
 void optionGreeksModel::calculateGammaVegaAdjustedDelta() const
 {
-    double gammaVegaAdjustedDelta = getDelta() + (0.5 * getGamma()) + getVega();
+    try
+    {
+        if (isnan(getDelta()) || isnan(getGamma()) || isnan(getVega()))
+        {
+            throw std::invalid_argument("Invalid input: NaN value detected");
+        }
 
-    setGammaVegaAdjustedDelta(gammaVegaAdjustedDelta);
+        double gammaVegaAdjustedDelta = getDelta() + (0.5 * getGamma()) + getVega();
+
+        setGammaVegaAdjustedDelta(gammaVegaAdjustedDelta);
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << "Error in calculateGammaVegaAdjustedDelta: " << e.what() << std::endl;
+        setGammaVegaAdjustedDelta(nan(""));
+    }
 }
 
 void optionGreeksModel::calculateD1(double impliedVolatility) const
 {
-    double numerator = log(getUnderlyingPrice()/getStrikePrice()) + (getRiskFreeRate() + 0.5 * impliedVolatility * impliedVolatility) * getTimeToExperation();
-    double denominator = impliedVolatility * sqrt(getTimeToExperation());
-    
-    double d1 = numerator / denominator;
-    setD1(d1);
+    try
+    {
+        if (isnan(getUnderlyingPrice()) || isnan(getStrikePrice()) || isnan(getRiskFreeRate()) || isnan(getTimeToExperation()) || isnan(impliedVolatility))
+        {
+            throw std::invalid_argument("Invalid input: NaN value detected");
+        }
+
+        double numerator = log(getUnderlyingPrice()/getStrikePrice()) + (getRiskFreeRate() + 0.5 * impliedVolatility * impliedVolatility) * getTimeToExperation();
+        double denominator = impliedVolatility * sqrt(getTimeToExperation());
+
+        double d1 = numerator / denominator;
+        setD1(d1);
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << "Error in calculateD1: " << e.what() << std::endl;
+        setD1(nan(""));
+    }
 }
+
+//  Rework tests to check all these calculations when params are empty.
+//  Need to create copy constructors?
