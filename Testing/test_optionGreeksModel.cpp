@@ -1,5 +1,6 @@
 #include "gtest/gtest.h"
 #include "../include/optionGreeksModel.h"
+#include <cmath>
 
 class optionGreeksModelTest : public testing::Test
 {
@@ -147,4 +148,80 @@ TEST_F(optionGreeksModelTest, CalculateGammaVegaAdjustedDelta)
 {
     model.calculateGammaVegaAdjustedDelta();
     // Add assertions to check if the Gamma Vega adjusted delta is correctly calculated
+}
+
+TEST_F(optionGreeksModelTest, CalculateOptionPriceIVWithNaN)
+{
+    model.setOptionPriceIV(NAN);
+    model.calculateOptionPriceIV(NAN);
+    EXPECT_TRUE(isnan(model.getOptionPriceIV()));
+}
+
+TEST_F(optionGreeksModelTest, CalculateOptionPriceGammaWithNaN)
+{
+    model.setOptionPriceGamma(NAN);
+    model.calculateOptionPriceGamma();
+    EXPECT_TRUE(isnan(model.getOptionPriceGamma()));
+}
+
+TEST_F(optionGreeksModelTest, CalculateOptionPriceVegaWithNaN)
+{
+    model.setOptionPriceVega(NAN);
+    model.calculateOptionPriceVega();
+    EXPECT_TRUE(isnan(model.getOptionPriceVega()));
+}
+
+TEST_F(optionGreeksModelTest, CalculateOptionPriceThetaWithNaN)
+{
+    model.setOptionPriceTheta(NAN);
+    model.calculateOptionPriceTheta();
+    EXPECT_TRUE(isnan(model.getOptionPriceTheta()));
+}
+
+TEST_F(optionGreeksModelTest, CalculateOptionPriceGammaVegaWithNaN)
+{
+    model.setOptionPriceGammaVega(NAN);
+    model.calculateOptionPriceGammaVega();
+    EXPECT_TRUE(isnan(model.getOptionPriceGammaVega()));
+}
+
+TEST_F(optionGreeksModelTest, CalculateIVAdjustedDeltaWithNaN)
+{
+    model.setIVAdjustedDelta(NAN);
+    model.calculateIVAdjustedDelta(NAN);
+    EXPECT_TRUE(isnan(model.getIVAdjustedDelta()));
+}
+
+TEST_F(optionGreeksModelTest, CalculateGammaAdjustedDeltaWithNaN)
+{
+    model.setGammaAdjustedDelta(NAN);
+    model.calculateGammaAdjustedDelta();
+    EXPECT_TRUE(isnan(model.getGammaAdjustedDelta()));
+}
+
+TEST_F(optionGreeksModelTest, CalculateVegaAdjustedDeltaWithNaN)
+{
+    model.setVegaAdjustedDelta(NAN);
+    model.calculateVegaAdjustedDelta();
+    EXPECT_TRUE(isnan(model.getVegaAdjustedDelta()));
+}
+
+TEST_F(optionGreeksModelTest, CalculateThetaAdjustedDeltaWithNaN)
+{
+    model.setThetaAdjustedDelta(NAN);
+    model.calculateThetaAdjustedDelta();
+    EXPECT_TRUE(isnan(model.getThetaAdjustedDelta()));
+}
+
+TEST_F(optionGreeksModelTest, CalculateGammaVegaAdjustedDeltaWithNaN)
+{
+    model.setGammaVegaAdjustedDelta(NAN);
+    model.calculateGammaVegaAdjustedDelta();
+    EXPECT_TRUE(isnan(model.getGammaVegaAdjustedDelta()));
+}
+
+TEST_F(optionGreeksModelTest, CalculateD1WithNaN)
+{
+    model.calculateD1(NAN);
+    EXPECT_TRUE(isnan(model.getD1()));
 }
