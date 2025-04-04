@@ -1,4 +1,5 @@
 #include "../include/optionGreeks.h"
+#include "../include/ErrorHandler.h"
 
 optionGreeks::optionGreeks()
 {
@@ -34,7 +35,7 @@ void optionGreeks::calculateDelta()
     }
     catch(const std::exception& e)
     {
-        std::cerr << "Error in calculateDelta: " <<e.what() << '\n';
+        ErrorHandler::logError("Error in calculateDelta: " + std::string(e.what()));
         setDelta(nan(""));
     }
 }
@@ -53,7 +54,7 @@ void optionGreeks::calculateGamma()
     }
     catch(const std::exception& e)
     {
-        std::cerr << "Error in calculateGamma: " << e.what() << '\n';
+        ErrorHandler::logError("Error in calculateGamma: " + std::string(e.what()));
         setGamma(nan(""));
     }
 }
@@ -72,7 +73,7 @@ void optionGreeks::calculateVega()
     }
     catch(const std::exception& e)
     {
-        std::cerr << "Error in calculateVega: " << e.what() << '\n';
+        ErrorHandler::logError("Error in calculateVega: " + std::string(e.what()));
         setVega(nan(""));
     }
 }
@@ -91,7 +92,7 @@ void optionGreeks::calculateTheta()
     }
     catch(const std::exception& e)
     {
-        std::cerr << "Error in calculateTheta: " << e.what() << '\n';
+        ErrorHandler::logError("Error in calculateTheta: " + std::string(e.what()));
         setTheta(nan(""));
     }
 }
@@ -110,7 +111,7 @@ void optionGreeks::calculateRho()
     }
     catch(const std::exception& e)
     {
-        std::cerr << "Error in calculateRho: " << e.what() << '\n';
+        ErrorHandler::logError("Error in calculateRho: " + std::string(e.what()));
         setRho(nan(""));
     }
 }

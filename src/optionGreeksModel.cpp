@@ -1,4 +1,5 @@
 #include "../include/optionGreeksModel.h"
+#include "../include/ErrorHandler.h"
 #include <stdexcept>
 #include <iostream>
 
@@ -126,7 +127,7 @@ void optionGreeksModel::calculateOptionPriceIV(const double& impliedVolatility) 
     }
     catch (const std::exception& e)
     {
-        std::cerr << "Error in calculateOptionPriceIV: " << e.what() << std::endl;
+        ErrorHandler::logError("Error in calculateOptionPriceIV: " + std::string(e.what()));
         setOptionPriceIV(nan(""));
     }
 }
@@ -147,7 +148,7 @@ void optionGreeksModel::calculateOptionPriceGamma() const
     }
     catch (const std::exception& e)
     {
-        std::cerr << "Error in calculateOptionPriceGamma: " << e.what() << std::endl;
+        ErrorHandler::logError("Error in calculateOptionPriceGamma: " + std::string(e.what()));
         setOptionPriceGamma(nan(""));
     }
 }
@@ -167,7 +168,7 @@ void optionGreeksModel::calculateOptionPriceVega() const
     }
     catch (const std::exception& e)
     {
-        std::cerr << "Error in calculateOptionPriceVega: " << e.what() << std::endl;
+        ErrorHandler::logError("Error in calculateOptionPriceVega: " + std::string(e.what()));
         setOptionPriceVega(nan(""));
     }
 }
@@ -187,7 +188,7 @@ void optionGreeksModel::calculateOptionPriceTheta() const
     }
     catch (const std::exception& e)
     {
-        std::cerr << "Error in calculateOptionPriceTheta: " << e.what() << std::endl;
+        ErrorHandler::logError("Error in calculateOptionPriceTheta: " + std::string(e.what()));
         setOptionPriceTheta(nan(""));
     }
 }
@@ -207,7 +208,7 @@ void optionGreeksModel::calculateOptionPriceGammaVega() const
     }
     catch (const std::exception& e)
     {
-        std::cerr << "Error in calculateOptionPriceGammaVega: " << e.what() << std::endl;
+        ErrorHandler::logError("Error in calculateOptionPriceGammaVega: " + std::string(e.what()));
         setOptionPriceGammaVega(nan(""));
     }
 }
@@ -228,7 +229,7 @@ void optionGreeksModel::calculateIVAdjustedDelta(double impliedVolatility) const
     }
     catch (const std::exception& e)
     {
-        std::cerr << "Error in calculateIVAdjustedDelta: " << e.what() << std::endl;
+        ErrorHandler::logError("Error in calculateIVAdjustedDelta: " + std::string(e.what()));
         setIVAdjustedDelta(nan(""));
     }
 }
@@ -248,7 +249,7 @@ void optionGreeksModel::calculateGammaAdjustedDelta() const
     }
     catch (const std::exception& e)
     {
-        std::cerr << "Error in calculateGammaAdjustedDelta: " << e.what() << std::endl;
+        ErrorHandler::logError("Error in calculateGammaAdjustedDelta: " + std::string(e.what()));
         setGammaAdjustedDelta(nan(""));
     }
 }
@@ -268,7 +269,7 @@ void optionGreeksModel::calculateVegaAdjustedDelta() const
     }
     catch (const std::exception& e)
     {
-        std::cerr << "Error in calculateVegaAdjustedDelta: " << e.what() << std::endl;
+        ErrorHandler::logError("Error in calculateVegaAdjustedDelta: " + std::string(e.what()));
         setVegaAdjustedDelta(nan(""));
     }
 }
@@ -288,7 +289,7 @@ void optionGreeksModel::calculateThetaAdjustedDelta() const
     }
     catch (const std::exception& e)
     {
-        std::cerr << "Error in calculateThetaAdjustedDelta: " << e.what() << std::endl;
+        ErrorHandler::logError("Error in calculateThetaAdjustedDelta: " + std::string(e.what()));
         setThetaAdjustedDelta(nan(""));
     }
 }
@@ -308,7 +309,7 @@ void optionGreeksModel::calculateGammaVegaAdjustedDelta() const
     }
     catch (const std::exception& e)
     {
-        std::cerr << "Error in calculateGammaVegaAdjustedDelta: " << e.what() << std::endl;
+        ErrorHandler::logError("Error in calculateGammaVegaAdjustedDelta: " + std::string(e.what()));
         setGammaVegaAdjustedDelta(nan(""));
     }
 }
@@ -330,7 +331,7 @@ void optionGreeksModel::calculateD1(double impliedVolatility) const
     }
     catch (const std::exception& e)
     {
-        std::cerr << "Error in calculateD1: " << e.what() << std::endl;
+        ErrorHandler::logError("Error in calculateD1: " + std::string(e.what()));
         setD1(nan(""));
     }
 }
