@@ -1,3 +1,4 @@
+#include "../include/ErrorHandler.h"
 #include "../include/hestonModel.h"
 #include "../include/blackScholesModel.h"
 #include <random>
@@ -20,15 +21,7 @@ hestonModel::hestonModel(double underlyingPrice, double strikePrice, double time
     setVolatility(volatility);
 }
 
-void logError(const std::string& errorMessage) {
-    std::ofstream errorLog("error.log", std::ios::app);
-    if (errorLog.is_open()) {
-        errorLog << errorMessage << std::endl;
-        errorLog.close();
-    }
-}
-
-double hestonModel::calculateOptionPrice() const
+double hestonModel::calculateOptionPrice(bool useMonteCarlo, int num_simulations, int num_time_steps) const
 {
     try
     {
@@ -36,127 +29,108 @@ double hestonModel::calculateOptionPrice() const
         {
             throw std::invalid_argument("Invalid input: One or more input parameters are NaN");
         }
-        if (getVolatility() < 0.0)
+        if (getVolatility() <= 0.0 || getV0() < 0.0 || getKappa() < 0.0 || getTheta() < 0.0 || getSigma() < 0.0)
         {
-            throw std::invalid_argument("Invalid input: Volatility must be greater than or equal to 0");
+            throw std::invalid_argument("Invalid input: Parameters must be non-negative");
         }
-        // Implement the Heston model option pricing formula
-        // This is a simplified version and may need further refinement for production use
 
-        // Define constants and parameters
-        const double pi = 3.14159265358979323846;
-        const std::complex<double> i(0, 1);
+        if (useMonteCarlo)
+        {
+            // Monte Carlo method
+            double dt = getTimeToExperation() / num_time_steps;
+            double optionPriceSum = 0.0;
 
-        // Define the characteristic function
-        const auto alpha = [&](std::complex<double> u) -> std::complex<double> {
-            return -u * u * 0.5 - i * u * getKappa() * getTheta();
-        };
+            std::random_device rd;
+            std::mt19937 generator(rd()); // Use mt19937 for better randomness
 
-        const auto beta = [&](std::complex<double> u) -> std::complex<double> {
-            return getKappa() - getRho() * getSigma() * i * u;
-        };
+            #pragma omp parallel for reduction(+:optionPriceSum)
+            for (int sim = 0; sim < num_simulations; sim++) {
+                double Vt = simulateVariance(generator, num_time_steps);
+                double simulatedVolatility = sqrt(Vt);
 
-        const auto gamma = [&](std::complex<double> u) -> std::complex<double> {
-            return getSigma() * getSigma() * 0.5;
-        };
+                double d1 = (log(getUnderlyingPrice() / getStrikePrice()) + (getRiskFreeRate() + 0.5 * simulatedVolatility * simulatedVolatility) * getTimeToExperation()) / (simulatedVolatility * sqrt(getTimeToExperation()));
+                double d2 = d1 - simulatedVolatility * sqrt(getTimeToExperation());
 
-        const auto D = [&](std::complex<double> u) -> std::complex<double> {
-            return std::sqrt(beta(u) * beta(u) - 4.0 * alpha(u) * gamma(u));
-        };
-
-        const auto G = [&](std::complex<double> u) -> std::complex<double> {
-            return (beta(u) - D(u)) / (beta(u) + D(u));
-        };
-
-        const auto C = [&](std::complex<double> u) -> std::complex<double> {
-            return getKappa() * (getTheta() * getTimeToExperation() * (beta(u) - D(u)) - 2.0 * std::log((1.0 - G(u) * std::exp(-D(u) * getTimeToExperation())) / (1.0 - G(u))));
-        };
-
-        const auto characteristicFunction = [&](std::complex<double> u) -> std::complex<double> {
-            return std::exp(C(u) + getV0() * (beta(u) - D(u)) * (1.0 - std::exp(-D(u) * getTimeToExperation())) / (1.0 - G(u) * std::exp(-D(u) * getTimeToExperation())));
-        };
-
-        // Integrate using adaptive quadrature
-        const auto integrand = [&](double phi) -> double {
-            std::complex<double> u(phi, -0.5);
-            std::complex<double> numerator = std::exp(i * u * std::log(getUnderlyingPrice() / getStrikePrice())) * characteristicFunction(u);
-            std::complex<double> denominator = i * u;
-            return std::real(numerator / denominator);
-        };
-
-        const auto adaptiveIntegrate = [&](double lower, double upper, int maxSteps) -> double {
-            double result = 0.0;
-            double step = (upper - lower) / maxSteps;
-            for (int j = 0; j < maxSteps; ++j) {
-                double phi1 = lower + j * step;
-                double phi2 = phi1 + step;
-                result += (integrand(phi1) + integrand(phi2)) * step / 2.0; // Trapezoidal rule
+                switch (getOptionType()) {
+                    case OptionType::CALL:
+                        optionPriceSum += getUnderlyingPrice() * normalCDF(d1) - getStrikePrice() * exp(-getRiskFreeRate() * getTimeToExperation()) * normalCDF(d2);
+                        break;
+                    case OptionType::PUT:
+                        optionPriceSum += getStrikePrice() * exp(-getRiskFreeRate() * getTimeToExperation()) * normalCDF(-d2) - getUnderlyingPrice() * normalCDF(-d1);
+                        break;
+                    default:
+                        throw std::invalid_argument("Invalid option type");
+                }
             }
-            return result;
-        };
 
-        double integral = adaptiveIntegrate(0.0, 100.0, 1000); // Adjust bounds and steps dynamically
+            return optionPriceSum / num_simulations;
+        }
+        else
+        {
+            // Analytic method using characteristic function
+            const double pi = 3.14159265358979323846;
+            const std::complex<double> i(0, 1);
 
-        // Calculate the option price
-        double optionPrice = getUnderlyingPrice() * 0.5 - getStrikePrice() * std::exp(-getRiskFreeRate() * getTimeToExperation()) * integral / pi;
-        return optionPrice;
+            const auto alpha = [&](std::complex<double> u) -> std::complex<double> {
+                return -u * u * 0.5 - i * u * getKappa() * getTheta();
+            };
+
+            const auto beta = [&](std::complex<double> u) -> std::complex<double> {
+                return getKappa() - getRho() * getSigma() * i * u;
+            };
+
+            const auto gamma = [&](std::complex<double> u) -> std::complex<double> {
+                return getSigma() * getSigma() * 0.5;
+            };
+
+            const auto D = [&](std::complex<double> u) -> std::complex<double> {
+                return std::sqrt(beta(u) * beta(u) - 4.0 * alpha(u) * gamma(u));
+            };
+
+            const auto G = [&](std::complex<double> u) -> std::complex<double> {
+                return (beta(u) - D(u)) / (beta(u) + D(u));
+            };
+
+            const auto C = [&](std::complex<double> u) -> std::complex<double> {
+                return getKappa() * (getTheta() * getTimeToExperation() * (beta(u) - D(u)) - 2.0 * std::log((1.0 - G(u) * std::exp(-D(u) * getTimeToExperation())) / (1.0 - G(u))));
+            };
+
+            const auto characteristicFunction = [&](std::complex<double> u) -> std::complex<double> {
+                return std::exp(C(u) + getV0() * (beta(u) - D(u)) * (1.0 - std::exp(-D(u) * getTimeToExperation())) / (1.0 - G(u) * std::exp(-D(u) * getTimeToExperation())));
+            };
+
+            const auto integrand = [&](double phi) -> double {
+                std::complex<double> u(phi, -0.5);
+                std::complex<double> numerator = std::exp(i * u * std::log(getUnderlyingPrice() / getStrikePrice())) * characteristicFunction(u);
+                std::complex<double> denominator = i * u;
+                return std::real(numerator / denominator);
+            };
+
+            const auto adaptiveIntegrate = [&](double lower, double upper, int maxSteps) -> double {
+                double result = 0.0;
+                double step = (upper - lower) / maxSteps;
+                for (int j = 0; j < maxSteps; ++j) {
+                    double phi1 = lower + j * step;
+                    double phi2 = phi1 + step;
+                    result += (integrand(phi1) + integrand(phi2)) * step / 2.0; // Trapezoidal rule
+                }
+                return result;
+            };
+
+            double integral = adaptiveIntegrate(0.0, 100.0, 1000);
+            double optionPrice = getUnderlyingPrice() * 0.5 - getStrikePrice() * std::exp(-getRiskFreeRate() * getTimeToExperation()) * integral / pi;
+            return optionPrice;
+        }
     }
     catch (const std::exception &e)
     {
-        std::string error = "Error in calculateOptionPrice: " + std::string(e.what());
-        logError(error);
+        ErrorHandler::logError("Error in calculateOptionPrice: " + std::string(e.what()));
         throw;
     }
 }
 
-double hestonModel::newCalculateOptionPrice() const
+double hestonModel::simulateVariance(std::mt19937& generator, int num_time_steps) const 
 {
-    try
-    {
-        if (getV0() < 0.0 || getKappa() < 0.0 || getTheta() < 0.0 || getSigma() < 0.0) {
-            throw std::invalid_argument("Invalid input: V0, kappa, theta, and sigma must be non-negative");
-        }
-
-        int num_simulations = 10000; // Number of Monte Carlo simulations
-        int num_time_steps = 1000;   // Number of time steps for Euler discretization
-        double dt = getTimeToExperation() / num_time_steps;
-
-        double optionPriceSum = 0.0;
-
-        std::default_random_engine generator(std::random_device{}());
-
-        #pragma omp parallel for reduction(+:optionPriceSum) // Parallelize Monte Carlo loop
-        for (int sim = 0; sim < num_simulations; sim++) {
-            double Vt = simulateVariance(generator, num_time_steps); // Simulate variance using helper function
-            double simulatedVolatility = sqrt(Vt);
-
-            double d1 = (log(getUnderlyingPrice() / getStrikePrice()) + (getRiskFreeRate() + 0.5 * simulatedVolatility * simulatedVolatility) * getTimeToExperation()) / (simulatedVolatility * sqrt(getTimeToExperation()));
-            double d2 = d1 - simulatedVolatility * sqrt(getTimeToExperation());
-
-            switch (getOptionType()) {
-                case OptionType::CALL:
-                    optionPriceSum += getUnderlyingPrice() * normalCDF(d1) - getStrikePrice() * exp(-getRiskFreeRate() * getTimeToExperation()) * normalCDF(d2);
-                    break;
-                case OptionType::PUT:
-                    optionPriceSum += getStrikePrice() * exp(-getRiskFreeRate() * getTimeToExperation()) * normalCDF(-d2) - getUnderlyingPrice() * normalCDF(-d1);
-                    break;
-                default:
-                    throw std::invalid_argument("Invalid option type");
-            }
-        }
-
-        double optionPrice = optionPriceSum / num_simulations; // Average over all simulations
-        return optionPrice;
-    }
-    catch (const std::exception &e)
-    {
-        std::string error = "Error in newCalculateOptionPrice: " + std::string(e.what());
-        logError(error);
-        throw;
-    }
-}
-
-double hestonModel::simulateVariance(std::default_random_engine& generator, int num_time_steps) const {
     try
     {
         double Vt = getV0();
@@ -176,13 +150,12 @@ double hestonModel::simulateVariance(std::default_random_engine& generator, int 
     }
     catch (const std::exception &e)
     {
-        std::string error = "Error in simulateVariance: " + std::string(e.what());
-        logError(error);
+        ErrorHandler::logError("Error in simulateVariance: " + std::string(e.what()));
         throw;
     }
 }
 
-double hestonModel::random_normal(std::default_random_engine& generator) const
+double hestonModel::random_normal(std::mt19937& generator) const
 {
     // Use thread-local storage for the random engine and distribution
     static std::normal_distribution<double> distribution(0.0, 1.0);

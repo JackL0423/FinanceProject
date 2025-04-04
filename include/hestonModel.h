@@ -13,13 +13,11 @@ class hestonModel : public blackScholesModel
 
         hestonModel(double underlyingPrice, double strikePrice, double timeToExperation, double riskFreeRate, double volatility, double v0, double kappa, double theta, double sigma, double rho, OptionType optionType);
 
-        double calculateOptionPrice() const;
+        double calculateOptionPrice(bool useMonteCarlo, int num_simulations, int num_time_steps) const;
 
-        double newCalculateOptionPrice() const;
+        double random_normal(std::mt19937& generator) const;
 
-        double random_normal(std::default_random_engine& generator) const;
-
-        double simulateVariance(std::default_random_engine& generator, int num_time_steps) const;
+        double simulateVariance(std::mt19937& generator, int num_time_steps) const;
 
         void setV0(const double& value) const;
 
