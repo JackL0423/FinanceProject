@@ -147,3 +147,7 @@ TEST_F(blackScholesModelTest, normalCDFTestDefault)
     EXPECT_TRUE(isnan(c.normalCDF(nan(""))));
 }
 
+TEST_F(blackScholesModelTest, EdgeCaseNegativeVolatility)
+{
+    EXPECT_THROW(blackScholesModel(16.2, 13.3, 18.0, 6.2, -4.5, blackScholesModel::OptionType::PUT), std::invalid_argument);
+}
