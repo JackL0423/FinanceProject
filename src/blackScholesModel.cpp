@@ -147,6 +147,11 @@ void blackScholesModel::setStrikePrice(const double& value)
 /// @param value 
 void blackScholesModel::setTimeToExperation(const double& value) 
 {
+    // TODO: [bug] add check for boundry conditions for timeToExperation
+    if (value < 0.0)
+    {
+        throw invalid_argument("Invalid input: timeToExpiration must be greater than or equal to 0");
+    }
     _timeToExperation = value; 
 }
 
@@ -160,8 +165,13 @@ void blackScholesModel::setRiskFreeRate(const double& value)
 /// @brief sets the volatility in the Black-Scholes model.
 /// @param value 
 void blackScholesModel::setVolatility(const double& value) 
-{ 
+{
+    if (value < 0.0)
+    {
+        throw invalid_argument("Invalid input: Volatility must be greater than or equal to 0");
+    }
     _volatility = value;
+    
 }
 
 /// @brief sets the option type in the Black-Scholes model.
