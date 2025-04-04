@@ -2,36 +2,53 @@
 #include <cmath>
 #include <numbers>
 #include "../include/blackScholesModel.h"
+#include "../include/ErrorHandler.h"
 
 using namespace std;
 
 /// @brief calculates and sets the d1 value in the Black-Scholes model. 
 void blackScholesModel::calculateD1()
 {
-    if (isnan(getUnderlyingPrice()) || isnan(getStrikePrice()) || isnan(getRiskFreeRate()) || isnan(getVolatility()) || isnan(getTimeToExperation()))
+    try
     {
-        setD1(nan(""));
-        return;
-    }
-    double numerator = log(getUnderlyingPrice()/getStrikePrice()) + (getRiskFreeRate() + 0.5 * getVolatility() * getVolatility()) * getTimeToExperation();
-    double denominator = getVolatility() * sqrt(getTimeToExperation());
-    
-    double d1 = numerator / denominator;
+        if (isnan(getUnderlyingPrice()) || isnan(getStrikePrice()) || isnan(getRiskFreeRate()) || isnan(getVolatility()) || isnan(getTimeToExperation()))
+        {
+            setD1(nan(""));
+            return;
+        }
+        double numerator = log(getUnderlyingPrice()/getStrikePrice()) + (getRiskFreeRate() + 0.5 * getVolatility() * getVolatility()) * getTimeToExperation();
+        double denominator = getVolatility() * sqrt(getTimeToExperation());
+        
+        double d1 = numerator / denominator;
 
-    setD1(d1);
+        setD1(d1);
+    }
+    catch (const std::exception& e)
+    {
+        ErrorHandler::logError("Error in calculateD1: " + std::string(e.what()));
+        setD1(nan(""));
+    }
 }
 
 /// @brief calculates and sets the d2 value in the Black-Scholes model.
 void blackScholesModel::calculateD2()
 {
-    if (isnan(getD1()) || isnan(getVolatility()) || isnan(getTimeToExperation()))
+    try
     {
-        setD2(nan(""));
-        return;
-    }
-    double d2 = getD1() - getVolatility() * sqrt(getTimeToExperation());
+        if (isnan(getD1()) || isnan(getVolatility()) || isnan(getTimeToExperation()))
+        {
+            setD2(nan(""));
+            return;
+        }
+        double d2 = getD1() - getVolatility() * sqrt(getTimeToExperation());
 
-    setD2(d2);
+        setD2(d2);
+    }
+    catch (const std::exception& e)
+    {
+        ErrorHandler::logError("Error in calculateD2: " + std::string(e.what()));
+        setD2(nan(""));
+    }
 }
 
 
@@ -39,19 +56,27 @@ void blackScholesModel::calculateD2()
 /// @return the option price.
 double blackScholesModel::calculateOptionPrice()
 {
-    if (isnan(getD1()) || isnan(getD2()))
+    try
     {
-        return nan("");
-    }
-    switch(getOptionType()) 
-    {
-        case CALL:
-            return getUnderlyingPrice() * normalCDF(getD1()) - getStrikePrice() * exp(-getRiskFreeRate() * getTimeToExperation()) * normalCDF(getD2());
-        
-        case PUT:
-            return getStrikePrice() * exp(-getRiskFreeRate() * getTimeToExperation()) * normalCDF(-getD2()) - getUnderlyingPrice() * normalCDF(-getD1());
-        default:
+        if (isnan(getD1()) || isnan(getD2()))
+        {
             return nan("");
+        }
+        switch(getOptionType()) 
+        {
+            case CALL:
+                return getUnderlyingPrice() * normalCDF(getD1()) - getStrikePrice() * exp(-getRiskFreeRate() * getTimeToExperation()) * normalCDF(getD2());
+            
+            case PUT:
+                return getStrikePrice() * exp(-getRiskFreeRate() * getTimeToExperation()) * normalCDF(-getD2()) - getUnderlyingPrice() * normalCDF(-getD1());
+            default:
+                return nan("");
+        }
+    }
+    catch (const std::exception& e)
+    {
+        ErrorHandler::logError("Error in calculateOptionPrice: " + std::string(e.what()));
+        return nan("");
     }
 }
 
@@ -59,14 +84,22 @@ double blackScholesModel::calculateOptionPrice()
 /// @brief calculates and sets the K value in the Black-Scholes model.
 void blackScholesModel::calculateK()
 {
-    if (isnan(getD1()))
+    try
     {
-        setK(nan(""));
-        return;
-    }
-    double K = 1.0 / (1.0 + 0.2316419 * abs(getD1()));
+        if (isnan(getD1()))
+        {
+            setK(nan(""));
+            return;
+        }
+        double K = 1.0 / (1.0 + 0.2316419 * abs(getD1()));
 
-    setK(K);
+        setK(K);
+    }
+    catch (const std::exception& e)
+    {
+        ErrorHandler::logError("Error in calculateK: " + std::string(e.what()));
+        setK(nan(""));
+    }
 }
 
 
@@ -147,12 +180,19 @@ void blackScholesModel::setStrikePrice(const double& value)
 /// @param value 
 void blackScholesModel::setTimeToExperation(const double& value) 
 {
-    // TODO: [bug] add check for boundry conditions for timeToExperation
-    if (value < 0.0)
+    try
     {
-        throw invalid_argument("Invalid input: timeToExpiration must be greater than or equal to 0");
+        if (value < 0.0)
+        {
+            throw invalid_argument("Invalid input: timeToExpiration must be greater than or equal to 0");
+        }
+        _timeToExperation = value;
     }
-    _timeToExperation = value; 
+    catch(const std::exception& e)
+    {
+        ErrorHandler::logError("Error in setTimeToExperation: " + std::string(e.what()));
+        _timeToExperation = nan("");
+    } 
 }
 
 /// @brief sets the risk free rate in the Black-Scholes model.
@@ -166,11 +206,19 @@ void blackScholesModel::setRiskFreeRate(const double& value)
 /// @param value 
 void blackScholesModel::setVolatility(const double& value) 
 {
-    if (value < 0.0)
+    try
     {
-        throw invalid_argument("Invalid input: Volatility must be greater than or equal to 0");
-    }
+        if (value <= 0.0)
+        {
+            throw invalid_argument("Invalid input: Volatility must be greater than or equal to 0");
+        }
     _volatility = value;
+    }
+    catch(const std::exception& e)
+    {
+        ErrorHandler::logError("Error in setVolatility: " + std::string(e.what()));
+        _volatility = nan("");
+    }
     
 }
 
