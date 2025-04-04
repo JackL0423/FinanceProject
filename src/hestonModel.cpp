@@ -3,6 +3,7 @@
 #include <random>
 #include <cmath>
 #include <complex>
+#include <fstream>
 
 hestonModel::hestonModel() : blackScholesModel()
 {
@@ -19,9 +20,17 @@ hestonModel::hestonModel(double underlyingPrice, double strikePrice, double time
     setVolatility(volatility);
 }
 
+void logError(const std::string& errorMessage) {
+    std::ofstream errorLog("error.log", std::ios::app);
+    if (errorLog.is_open()) {
+        errorLog << errorMessage << std::endl;
+        errorLog.close();
+    }
+}
+
 double hestonModel::calculateOptionPrice() const
 {
-        try
+    try
     {
         if (isnan(getUnderlyingPrice()) || isnan(getStrikePrice()) || isnan(getTimeToExperation()) || isnan(getRiskFreeRate()) || isnan(getVolatility()) || isnan(getV0()) || isnan(getKappa()) || isnan(getTheta()) || isnan(getSigma()) || isnan(getRho()))
         {
@@ -67,7 +76,7 @@ double hestonModel::calculateOptionPrice() const
             return std::exp(C(u) + getV0() * (beta(u) - D(u)) * (1.0 - std::exp(-D(u) * getTimeToExperation())) / (1.0 - G(u) * std::exp(-D(u) * getTimeToExperation())));
         };
 
-        // Integrate using the trapezoidal rule
+        // Integrate using adaptive quadrature
         const auto integrand = [&](double phi) -> double {
             std::complex<double> u(phi, -0.5);
             std::complex<double> numerator = std::exp(i * u * std::log(getUnderlyingPrice() / getStrikePrice())) * characteristicFunction(u);
@@ -75,17 +84,18 @@ double hestonModel::calculateOptionPrice() const
             return std::real(numerator / denominator);
         };
 
-        double integral = 0.0;
-        const int N = 1000; // Number of integration steps
-        const double upperLimit = 100.0; // Upper limit of integration
-        const double delta = upperLimit / N;
+        const auto adaptiveIntegrate = [&](double lower, double upper, int maxSteps) -> double {
+            double result = 0.0;
+            double step = (upper - lower) / maxSteps;
+            for (int j = 0; j < maxSteps; ++j) {
+                double phi1 = lower + j * step;
+                double phi2 = phi1 + step;
+                result += (integrand(phi1) + integrand(phi2)) * step / 2.0; // Trapezoidal rule
+            }
+            return result;
+        };
 
-        for (int j = 1; j < N; ++j) {
-            double phi = j * delta;
-            integral += integrand(phi);
-        }
-
-        integral *= delta;
+        double integral = adaptiveIntegrate(0.0, 100.0, 1000); // Adjust bounds and steps dynamically
 
         // Calculate the option price
         double optionPrice = getUnderlyingPrice() * 0.5 - getStrikePrice() * std::exp(-getRiskFreeRate() * getTimeToExperation()) * integral / pi;
@@ -93,67 +103,83 @@ double hestonModel::calculateOptionPrice() const
     }
     catch (const std::exception &e)
     {
-        std::cerr << "Error in calculateOptionPrice: " << e.what() << std::endl;
+        std::string error = "Error in calculateOptionPrice: " + std::string(e.what());
+        logError(error);
         throw;
     }
 }
 
 double hestonModel::newCalculateOptionPrice() const
 {
-    if (getV0() < 0.0 || getKappa() < 0.0 || getTheta() < 0.0 || getSigma() < 0.0) {
-        throw std::invalid_argument("Invalid input: V0, kappa, theta, and sigma must be non-negative");
-    }
-
-    int num_simulations = 10000; // Number of Monte Carlo simulations
-    int num_time_steps = 1000;   // Number of time steps for Euler discretization
-    double dt = getTimeToExperation() / num_time_steps;
-
-    double optionPriceSum = 0.0;
-
-    std::default_random_engine generator(std::random_device{}());
-
-    for (int sim = 0; sim < num_simulations; sim++) {
-        double Vt = simulateVariance(generator, num_time_steps); // Simulate variance using helper function
-        double simulatedVolatility = sqrt(Vt);
-
-        double d1 = (log(getUnderlyingPrice() / getStrikePrice()) + (getRiskFreeRate() + 0.5 * simulatedVolatility * simulatedVolatility) * getTimeToExperation()) / (simulatedVolatility * sqrt(getTimeToExperation()));
-        double d2 = d1 - simulatedVolatility * sqrt(getTimeToExperation());
-
-        switch (getOptionType()) {
-            case OptionType::CALL:
-                optionPriceSum += getUnderlyingPrice() * normalCDF(d1) - getStrikePrice() * exp(-getRiskFreeRate() * getTimeToExperation()) * normalCDF(d2);
-                break;
-            case OptionType::PUT:
-                optionPriceSum += getStrikePrice() * exp(-getRiskFreeRate() * getTimeToExperation()) * normalCDF(-d2) - getUnderlyingPrice() * normalCDF(-d1);
-                break;
-            default:
-                throw std::invalid_argument("Invalid option type");
+    try
+    {
+        if (getV0() < 0.0 || getKappa() < 0.0 || getTheta() < 0.0 || getSigma() < 0.0) {
+            throw std::invalid_argument("Invalid input: V0, kappa, theta, and sigma must be non-negative");
         }
-    }
 
-    double optionPrice = optionPriceSum / num_simulations; // Average over all simulations
-    return optionPrice;
+        int num_simulations = 10000; // Number of Monte Carlo simulations
+        int num_time_steps = 1000;   // Number of time steps for Euler discretization
+        double dt = getTimeToExperation() / num_time_steps;
+
+        double optionPriceSum = 0.0;
+
+        std::default_random_engine generator(std::random_device{}());
+
+        #pragma omp parallel for reduction(+:optionPriceSum) // Parallelize Monte Carlo loop
+        for (int sim = 0; sim < num_simulations; sim++) {
+            double Vt = simulateVariance(generator, num_time_steps); // Simulate variance using helper function
+            double simulatedVolatility = sqrt(Vt);
+
+            double d1 = (log(getUnderlyingPrice() / getStrikePrice()) + (getRiskFreeRate() + 0.5 * simulatedVolatility * simulatedVolatility) * getTimeToExperation()) / (simulatedVolatility * sqrt(getTimeToExperation()));
+            double d2 = d1 - simulatedVolatility * sqrt(getTimeToExperation());
+
+            switch (getOptionType()) {
+                case OptionType::CALL:
+                    optionPriceSum += getUnderlyingPrice() * normalCDF(d1) - getStrikePrice() * exp(-getRiskFreeRate() * getTimeToExperation()) * normalCDF(d2);
+                    break;
+                case OptionType::PUT:
+                    optionPriceSum += getStrikePrice() * exp(-getRiskFreeRate() * getTimeToExperation()) * normalCDF(-d2) - getUnderlyingPrice() * normalCDF(-d1);
+                    break;
+                default:
+                    throw std::invalid_argument("Invalid option type");
+            }
+        }
+
+        double optionPrice = optionPriceSum / num_simulations; // Average over all simulations
+        return optionPrice;
+    }
+    catch (const std::exception &e)
+    {
+        std::string error = "Error in newCalculateOptionPrice: " + std::string(e.what());
+        logError(error);
+        throw;
+    }
 }
 
 double hestonModel::simulateVariance(std::default_random_engine& generator, int num_time_steps) const {
-    double Vt = getV0();
-    double dt = getTimeToExperation() / num_time_steps;
-    
-    std::vector<double> Z1(num_time_steps);
-    std::vector<double> Z2(num_time_steps);
-
-    for (int i = 0; i < num_time_steps; i++) {
-        Z1[i] = random_normal(generator);
-        Z2[i] = getRho() * Z1[i] + sqrt(1.0 - getRho() * getRho()) * random_normal(generator);
-    }
-
-    for (int i = 0; i < num_time_steps; i++)
+    try
     {
-        Vt = Vt + getKappa() * (getTheta() - std::max(0.0, Vt)) * dt + getSigma() * sqrt(std::max(0.0, Vt) * dt) * Z2[i];
-        Vt = std::max(0.0, Vt); // Ensure non-negativity
-    }
+        double Vt = getV0();
+        double dt = getTimeToExperation() / num_time_steps;
 
-    return Vt;
+        std::normal_distribution<double> normalDist(0.0, 1.0);
+
+        for (int i = 0; i < num_time_steps; i++) {
+            double Z1 = normalDist(generator);
+            double Z2 = getRho() * Z1 + sqrt(1.0 - getRho() * getRho()) * normalDist(generator);
+
+            Vt += getKappa() * (getTheta() - std::max(0.0, Vt)) * dt + getSigma() * sqrt(std::max(0.0, Vt) * dt) * Z2;
+            Vt = std::max(0.0, Vt); // Ensure non-negativity
+        }
+
+        return Vt;
+    }
+    catch (const std::exception &e)
+    {
+        std::string error = "Error in simulateVariance: " + std::string(e.what());
+        logError(error);
+        throw;
+    }
 }
 
 double hestonModel::random_normal(std::default_random_engine& generator) const
