@@ -116,3 +116,27 @@ TEST_F(hestonModelTest, BoundaryConditionLongTimeToExpiration)
     EXPECT_NEAR(optionPrice, 50.0, 10.0); // Adjust the expected value and tolerance as needed
 }
 
+TEST(HestonModelTest, ValidInputs) {
+    hestonModel model(100.0, 100.0, 1.0, 0.05, 0.2, 0.04, 2.0, 0.04, 0.3, -0.7, blackScholesModel::OptionType::CALL);
+    EXPECT_NO_THROW(model.calculateOptionPrice());
+    EXPECT_NO_THROW(model.newCalculateOptionPrice());
+}
+
+TEST(HestonModelTest, ZeroVolatility) {
+    hestonModel model(100.0, 100.0, 1.0, 0.05, 0.0, 0.04, 2.0, 0.04, 0.3, -0.7, blackScholesModel::OptionType::CALL);
+    EXPECT_NO_THROW(model.calculateOptionPrice());
+    EXPECT_NO_THROW(model.newCalculateOptionPrice());
+}
+
+TEST(HestonModelTest, ExtremeCorrelation) {
+    hestonModel model(100.0, 100.0, 1.0, 0.05, 0.2, 0.04, 2.0, 0.04, 0.3, 1.0, blackScholesModel::OptionType::CALL);
+    EXPECT_NO_THROW(model.calculateOptionPrice());
+    EXPECT_NO_THROW(model.newCalculateOptionPrice());
+}
+
+TEST(HestonModelTest, InvalidInputs) {
+    hestonModel model;
+    EXPECT_THROW(model.calculateOptionPrice(), std::invalid_argument);
+    EXPECT_THROW(model.newCalculateOptionPrice(), std::invalid_argument);
+}
+
