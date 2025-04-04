@@ -6,11 +6,11 @@ strike_price = 100.0
 time_to_expiration = 1.0
 risk_free_rate = 0.05
 volatility = 0.20
-v0 = 0.04
-kappa = 2.0
+v0 = 0.005
+kappa = 0.8
 theta = 0.04
 sigma = 0.3
-rho = -0.7
+rho = 0.2
 
 # option type
 option_type = ql.Option.Put
