@@ -4,7 +4,9 @@
 #include "blackScholesModel.h"
 #include "optionGreeksModel.h"
 
-class hestonModel : public optionGreeksModel
+#include <random>
+
+class hestonModel : public blackScholesModel
 {
     public: 
         hestonModel();
@@ -12,6 +14,12 @@ class hestonModel : public optionGreeksModel
         hestonModel(double underlyingPrice, double strikePrice, double timeToExperation, double riskFreeRate, double volatility, double v0, double kappa, double theta, double sigma, double rho, OptionType optionType);
 
         double calculateOptionPrice() const;
+
+        double newCalculateOptionPrice() const;
+
+        double random_normal(std::default_random_engine& generator) const;
+
+        double simulateVariance(std::default_random_engine& generator, int num_time_steps) const;
 
         void setV0(const double& value) const;
 
