@@ -43,3 +43,4 @@ double rootMeanSquareError(const std::vector<double>& estimatedPrices, const std
     }
     
 }
+
