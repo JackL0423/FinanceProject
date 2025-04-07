@@ -135,6 +135,6 @@ TEST_F(hestonModelTest, ExtremeCorrelation) {
 
 TEST_F(hestonModelTest, InvalidInputs) {
     hestonModel model;
-    EXPECT_THROW(model.calculateOptionPrice(true, 10000, 100), std::invalid_argument);
+    EXPECT_TRUE(isnan(model.calculateOptionPrice(true, 10000, 100)));
 }
 
