@@ -1,9 +1,9 @@
 import QuantLib as ql
 
 # Parameters
-underlying_price = 100.0
-strike_price = 100.0
-time_to_expiration = 1.0
+underlying_price = 50.0
+strike_price = 45.0
+time_to_expiration = 0.0822
 risk_free_rate = 0.05
 volatility = 0.20
 v0 = 0.005
@@ -13,7 +13,7 @@ sigma = 0.3
 rho = 0.2
 
 # option type
-option_type = ql.Option.Put
+option_type = ql.Option.Call
 
 # Heston process
 spot_handle = ql.QuoteHandle(ql.SimpleQuote(underlying_price))
