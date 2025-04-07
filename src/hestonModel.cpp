@@ -130,7 +130,7 @@ double hestonModel::calculateOptionPrice(bool useMonteCarlo, int num_simulations
     {
         ErrorHandler::logError("Error in calculateOptionPrice: " + std::string(e.what()));
         return nan("");
-        throw;
+        //throw;
     }
 }
 
