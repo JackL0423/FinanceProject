@@ -54,6 +54,7 @@ double hestonModel::calculateOptionPrice(bool useMonteCarlo, int num_simulations
                 switch (getOptionType()) {
                     case OptionType::CALL:
                         optionPriceSum += getUnderlyingPrice() * normalCDF(d1) - getStrikePrice() * exp(-getRiskFreeRate() * getTimeToExperation()) * normalCDF(d2);
+                        //cout << "Sim num: " << sim << ", Call option price: " << optionPriceSum << endl;
                         break;
                     case OptionType::PUT:
                         optionPriceSum += getStrikePrice() * exp(-getRiskFreeRate() * getTimeToExperation()) * normalCDF(-d2) - getUnderlyingPrice() * normalCDF(-d1);
@@ -67,6 +68,7 @@ double hestonModel::calculateOptionPrice(bool useMonteCarlo, int num_simulations
         }
         else
         {
+            //TODO: Incorporate variance / volatility into the characteristic function.
             // Analytic method using characteristic function
             const double pi = 3.14159265358979323846;
             const std::complex<double> i(0, 1);
@@ -114,17 +116,20 @@ double hestonModel::calculateOptionPrice(bool useMonteCarlo, int num_simulations
                     double phi2 = phi1 + step;
                     result += (integrand(phi1) + integrand(phi2)) * step / 2.0; // Trapezoidal rule
                 }
+                //cout << "Adaptive integration result: " << result << endl;
                 return result;
             };
 
             double integral = adaptiveIntegrate(0.0, 100.0, 1000);
-            double optionPrice = getUnderlyingPrice() * 0.5 - getStrikePrice() * std::exp(-getRiskFreeRate() * getTimeToExperation()) * integral / pi;
+            //double optionPrice = getUnderlyingPrice() * 0.5 - getStrikePrice() * std::exp(-getRiskFreeRate() * getTimeToExperation()) * integral / pi;
+            double optionPrice = getUnderlyingPrice() - getStrikePrice() * std::exp(-getRiskFreeRate() * getTimeToExperation()) * integral / pi;
             return optionPrice;
         }
     }
     catch (const std::exception &e)
     {
         ErrorHandler::logError("Error in calculateOptionPrice: " + std::string(e.what()));
+        return nan("");
         throw;
     }
 }
