@@ -1,4 +1,5 @@
 #include "gtest/gtest.h"
+#include "../include/ErrorHandler.h"
 #include "../include/blackScholesModel.h"
 #include "../include/hestonModel.h"
 
@@ -100,7 +101,7 @@ TEST_F(hestonModelTest, EdgeCaseHighVolatility)
 TEST_F(hestonModelTest, InvalidNegativeVolatility)
 {
     hestonModel model(100.0, 100.0, 1.0, 0.05, -0.2, 0.04, 2.0, 0.04, 0.3, -0.7, optionGreeksModel::OptionType::CALL);
-    EXPECT_THROW(model.calculateOptionPrice(true, 10000, 100), std::invalid_argument);
+    EXPECT_TRUE(isnan(model.calculateOptionPrice(true, 10000, 100)));
 }
 
 TEST_F(hestonModelTest, BoundaryConditionZeroTimeToExpiration)
@@ -117,22 +118,22 @@ TEST_F(hestonModelTest, BoundaryConditionLongTimeToExpiration)
     EXPECT_NEAR(optionPrice, 50.0, 10.0); // Adjust the expected value and tolerance as needed
 }
 
-TEST(HestonModelTest, ValidInputs) {
+TEST_F(hestonModelTest, ValidInputs) {
     hestonModel model(100.0, 100.0, 1.0, 0.05, 0.2, 0.04, 2.0, 0.04, 0.3, -0.7, blackScholesModel::OptionType::CALL);
     EXPECT_NO_THROW(model.calculateOptionPrice(true, 10000, 100));
 }
 
-TEST(HestonModelTest, ZeroVolatility) {
+TEST_F(hestonModelTest, ZeroVolatility) {
     hestonModel model(100.0, 100.0, 1.0, 0.05, 0.0, 0.04, 2.0, 0.04, 0.3, -0.7, blackScholesModel::OptionType::CALL);
     EXPECT_NO_THROW(model.calculateOptionPrice(true, 10000, 100));
 }
 
-TEST(HestonModelTest, ExtremeCorrelation) {
+TEST_F(hestonModelTest, ExtremeCorrelation) {
     hestonModel model(100.0, 100.0, 1.0, 0.05, 0.2, 0.04, 2.0, 0.04, 0.3, 1.0, blackScholesModel::OptionType::CALL);
     EXPECT_NO_THROW(model.calculateOptionPrice(true, 10000, 100));
 }
 
-TEST(HestonModelTest, InvalidInputs) {
+TEST_F(hestonModelTest, InvalidInputs) {
     hestonModel model;
     EXPECT_THROW(model.calculateOptionPrice(true, 10000, 100), std::invalid_argument);
 }

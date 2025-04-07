@@ -212,7 +212,7 @@ void blackScholesModel::setVolatility(const double& value)
         {
             throw invalid_argument("Invalid input: Volatility must be greater than or equal to 0");
         }
-    _volatility = value;
+        _volatility = value;
     }
     catch(const std::exception& e)
     {
