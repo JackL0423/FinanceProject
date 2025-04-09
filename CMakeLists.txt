@@ -1,36 +1,36 @@
 cmake_minimum_required(VERSION 3.27)
 
-# cpp standard
+# Set the C++ standard
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-# link libraries together... might fix errors in options.
 
-# link project to main.cpp
+# Project name
 project(buildTest)
 
-add_library(ScholesModel src/blackScholesModel.cpp)
-add_library(optionGreeks src/optionGreeks.cpp)
-add_library(optionGreeksModel src/optionGreeksModel.cpp)
-add_library(hestonModel src/hestonModel.cpp)
-
-# Set include directories for libraries
-target_include_directories(ScholesModel PUBLIC /include)
-target_include_directories(optionGreeks PUBLIC /include)
-target_include_directories(optionGreeksModel PUBLIC /include)
-target_include_directories(hestonModel PUBLIC /include)
-
-# Set C++ standard for libraries
-target_compile_features(ScholesModel PUBLIC cxx_std_23)
-target_compile_features(optionGreeks PUBLIC cxx_std_23)
-target_compile_features(optionGreeksModel PUBLIC cxx_std_23)
-target_compile_features(hestonModel PUBLIC cxx_std_23)
-
-# Add the test executable
-add_executable(${PROJECT_NAME} src/main.cpp)
-
-target_link_libraries(${PROJECT_NAME}
-    ScholesModel
+# Define library sources
+set(LIBRARIES
+    inputReader
+    RMSE
+    blackScholesModel
     optionGreeks
     optionGreeksModel
     hestonModel
 )
+
+# Add libraries
+foreach(LIB ${LIBRARIES})
+    add_library(${LIB} src/${LIB}.cpp)
+    target_compile_features(${LIB} PUBLIC cxx_std_23)
+endforeach()
+
+# Add the test executable
+add_executable(${PROJECT_NAME} src/main.cpp)
+
+# Set include directories
+target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/include)
+
+# Link libraries to the executable
+target_link_libraries(${PROJECT_NAME} ${LIBRARIES})
+
+# Ensure inputReader.cpp and RMSE.cpp are included
+target_sources(${PROJECT_NAME} PRIVATE src/inputReader.cpp src/RMSE.cpp)
