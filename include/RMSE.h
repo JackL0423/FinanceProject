@@ -4,6 +4,6 @@
 #include <vector>
 #include <cmath>
 
-double rootMeanSquareError(const std::vector<double>& estimatedPrices, const std::vector<double>& actualPrices);
+double rootMeanSquareError(const std::vector<double>& observed, const std::vector<double>& predicted);
 
-#endif//RMSE_H
+#endif // RMSE_H

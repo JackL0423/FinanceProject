@@ -1,13 +1,16 @@
 #include "../include/inputReader.h"
 #include "../include/ErrorHandler.h"
 
+#include <iostream>
+#include <fstream>
 
-std::vector<CSVData>CSVDataReader(const std::string& filename)
+std::vector<CSVData> CSVDataReader(const std::string& filename)
 {
     try
     {
         std::vector<CSVData> data;
-        std::ifstream file(filename);
+        std::ifstream file;
+        file.open(filename);
         if (!file.is_open())
         {
             throw std::runtime_error("Could not open file: " + filename);
@@ -17,12 +20,6 @@ std::vector<CSVData>CSVDataReader(const std::string& filename)
         if (!std::getline(file, line)) // Check for empty file
         {
             throw std::runtime_error("File is empty: " + filename);
-        }
-
-        // Validate header line
-        if (line != "Expiration,StockPrice,StrikePrice,CallPrice")
-        {
-            throw std::runtime_error("Invalid header format in file: " + filename);
         }
 
         while (std::getline(file, line))

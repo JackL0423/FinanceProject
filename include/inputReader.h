@@ -7,6 +7,8 @@
 #include <sstream>
 #include <vector>
 
+#include "ErrorHandler.h"
+
 class CSVData
 {
     public:
@@ -21,8 +23,8 @@ class CSVData
         double getCallPrice() const { return _callPrice; }
         void print() const
         {
-            std::cout << "Expiration: " << _expiration << ", Stock Price: " << _stockPrice
-                      << ", Strike Price: " << _strikePrice << ", Call Price: " << _callPrice << std::endl;
+            std::cout << "Expiration: " << getExpiration() << ", Stock Price: " << getStockPrice()
+                      << ", Strike Price: " << getStrikePrice() << ", Call Price: " << getCallPrice() << std::endl;
         }
 
     private:
@@ -32,6 +34,6 @@ class CSVData
         double _callPrice;
 };
 
-std::vector<CSVData>CSVDataReader(const std::string& filename);
+std::vector<CSVData> CSVDataReader(const std::string& filename);
 
-#endif//INPUTREADER_H
+#endif // INPUTREADER_H
