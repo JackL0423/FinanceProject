@@ -2,6 +2,7 @@
 #define BLACKSCHOLESMODEL_H
 
 #include<iostream>
+#include "optionType.h"
 
 using namespace std;
 
@@ -133,68 +134,62 @@ class blackScholesModel
 
     void calculateK();
 
-    public:
-        enum OptionType {
-            CALL,
-            PUT
-        } _optionType;
-
     friend class inputReader;
     friend class optionGreeks;
     friend class optionGreeksModel;
     friend class hestonModel;
 
+    public:
+        blackScholesModel();
 
-    blackScholesModel();
-
-    blackScholesModel(double underlyingPrice, double strikePrice, double timeToExpiration,
+        blackScholesModel(double underlyingPrice, double strikePrice, double timeToExpiration,
                       double riskFreeRate, double volatility);
     
-    blackScholesModel(double underlyingPrice, double strikePrice, double timeToExperation,
+        blackScholesModel(double underlyingPrice, double strikePrice, double timeToExperation,
                       double riskFreeRate, double volatility, OptionType optionType);
 
 
-    double calculateOptionPrice();
+        double calculateOptionPrice();
 
-    const double normalCDF(const double& d) const;
-
-
-    void setUnderlyingPrice(const double& value);
-
-    void setStrikePrice(const double& value);
-
-    void setTimeToExperation(const double& value);
-
-    void setRiskFreeRate(const double& value);
-
-    void setVolatility(const double& value);
-
-    void setOptionType(const OptionType& option);
-
-    void setD1(const double& value) const;
-
-    void setD2(const double& value) const;
-
-    void setK(const double& value) const;
+        const double normalCDF(const double& d) const;
 
 
-    const double& getUnderlyingPrice() const;
+        void setUnderlyingPrice(const double& value);
 
-    const double& getStrikePrice() const;
+        void setStrikePrice(const double& value);
 
-    const double& getTimeToExperation() const;
+        void setTimeToExperation(const double& value);
 
-    const double& getRiskFreeRate() const;
+        void setRiskFreeRate(const double& value);
 
-    const double& getVolatility() const;
+        void setVolatility(const double& value);
 
-    const OptionType getOptionType() const;
+        void setOptionType(const OptionType& option);
 
-    const double& getD1() const;
+        void setD1(const double& value) const;
 
-    const double& getD2() const;
+        void setD2(const double& value) const;
 
-    const double& getK() const;
+        void setK(const double& value) const;
+
+
+        const double& getUnderlyingPrice() const;
+
+        const double& getStrikePrice() const;
+
+        const double& getTimeToExperation() const;
+
+        const double& getRiskFreeRate() const;
+
+        const double& getVolatility() const;
+
+        const OptionType getOptionType() const;
+
+        const double& getD1() const;
+
+        const double& getD2() const;
+
+        const double& getK() const;
 
     private:
         double _underlyingPrice;
@@ -202,6 +197,7 @@ class blackScholesModel
         double _timeToExperation;
         double _riskFreeRate;
         double _volatility;      //  One varaible that cannot be predicted, future market risk
+        OptionType _optionType;
         
 };  //  BlackScholesModel Class 
 

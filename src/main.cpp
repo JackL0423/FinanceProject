@@ -4,13 +4,13 @@
 #include <vector>
 #include <string>
 
+#include "../include/blackScholesModel.h"
 #include "../include/hestonModel.h"
 #include "../include/RMSE.h"
 #include "../include/inputReader.h"
+#include "../include/optionType.h"
 
 using namespace std;
-
-//double newOptionPriceCalc(double, double, double, double, double, double, double, double, double, double, optionGreeksModel::OptionType);
 
 // aiming for ~6.682601659241039
 int main()
@@ -27,7 +27,7 @@ int main()
     double theta = 0.04;
     double sigma = 0.3;
     double rho = 0.2;
-    optionGreeksModel::OptionType optionType = optionGreeksModel::OptionType::CALL;
+    OptionType optionType = CALL;
     hestonModel model(underlyingPrice, strikePrice, timeToExperation, riskFreeRate, volatility, v0, kappa, theta, sigma, rho, optionType);
 
     cout << "QuantLib option price: 6.682601659241039" << endl;
@@ -63,7 +63,7 @@ int main()
             double CSVstrikePrice = row.getStrikePrice();
             double callPrice = row.getCallPrice();
 
-            blackScholesModel bModel(stockPrice, CSVstrikePrice, expiration, 6.50e-10, 2.38e-3, blackScholesModel::OptionType::CALL);
+            blackScholesModel bModel(stockPrice, CSVstrikePrice, expiration, 6.50e-10, 2.38e-3, CALL);
             double estimatedPrice = bModel.calculateOptionPrice();
             estimatedPrices.push_back(estimatedPrice);
         }
@@ -86,7 +86,7 @@ int main()
             double CSVstrikePrice = row.getStrikePrice();
             double callPrice = row.getCallPrice();
 
-            hestonModel hModel(stockPrice, CSVstrikePrice, expiration, 6.50e-10, 2.38e-3, sqrt(2.38e-3), 2.0, 5.16e-5, 0.2, 0.2, hestonModel::OptionType::CALL);
+            hestonModel hModel(stockPrice, CSVstrikePrice, expiration, 6.50e-10, 2.38e-3, sqrt(2.38e-3), 2.0, 5.16e-5, 0.2, 0.2, CALL);
             double estimatedPrice = hModel.calculateOptionPrice(true, 1000, 1000);
             estimatedPricesHeston.push_back(estimatedPrice);
         }
@@ -110,6 +110,10 @@ int main()
 
 // TODO: Relook at hestonModel::calculateOptionPrice
 //      * lambda functions may be unnecessary, look at using parent functions
+// TODO: reorganize project structure
+// TODO: take a look at cmake files and figure out how to make it more modular, and remove error logs when cleaning
+// TODO: research how I can use namespaces
+// TODO: centralize error logging
 // TODO: implement lattice walks
 // TODO: implement Wierner process for higher R^n dimensionality
 // TODO: imlement Ornstein-Uhlenbeck process

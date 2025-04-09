@@ -272,7 +272,7 @@ const double& blackScholesModel::getVolatility() const { return _volatility; }
 
 /// @brief getter for the option type in the Black-Scholes model.
 /// @return _optionType
-const blackScholesModel::OptionType blackScholesModel::getOptionType() const { return _optionType; }
+const OptionType blackScholesModel::getOptionType() const { return _optionType; }
 
 /// @brief getter for the D1 value in the Black-Scholes model.
 /// @return _d1
