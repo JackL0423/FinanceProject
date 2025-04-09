@@ -112,3 +112,4 @@ int main()
 //      * lambda functions may be unnecessary, look at using parent functions
 // TODO: implement lattice walks
 // TODO: implement Wierner process for higher R^n dimensionality
+// TODO: imlement Ornstein-Uhlenbeck process
