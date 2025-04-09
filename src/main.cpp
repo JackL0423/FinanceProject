@@ -1,6 +1,12 @@
 #include<iostream>
-#include "../include/hestonModel.h"
+#include<fstream>
 #include <chrono>
+#include <vector>
+#include <string>
+
+#include "../include/hestonModel.h"
+#include "../include/RMSE.h"
+#include "../include/inputReader.h"
 
 using namespace std;
 
@@ -26,7 +32,7 @@ int main()
 
     cout << "QuantLib option price: 6.682601659241039" << endl;
     cout << "Heston model without monte-carlo: " << model.calculateOptionPrice(false, 10000, 1000) << endl;
-    cout << "Heston model with monte-carlo: " << model.calculateOptionPrice(true, 10, 1000) << endl;
+    cout << "Heston model with monte-carlo: " << model.calculateOptionPrice(true, 10000, 1000) << endl;
 
     // Test for the black scholes model class
     blackScholesModel bsModel(underlyingPrice, strikePrice, timeToExperation, riskFreeRate, volatility, optionType);
@@ -36,6 +42,49 @@ int main()
     optionGreeksModel greeksModel(underlyingPrice, strikePrice, timeToExperation, riskFreeRate, volatility);
     cout << "Option Greeks model option price: " << greeksModel.getOptionPriceIV() << endl;
 
+
+    // Testing for the inputReader class and RMSE function.
+    std::string filename = "/Users/jacklight/FinanceProject/Test_Data.csv";
+
+    std::vector<CSVData> data = CSVDataReader(filename);
+    if (data.empty())
+    {
+        cout << "No data found in the file." << endl;
+    }
+    else
+    {
+        cout << "Data from CSV file:" << endl;
+        for (const auto& row : data)
+        {
+            row.print();
+        }
+
+        // get data from CSV file and plug into models
+        std::vector<double> estimatedPrices;
+        for (const auto& row : data)
+        {
+            double expiration = row.getExpiration();
+            double stockPrice = row.getStockPrice();
+            double CSVstrikePrice = row.getStrikePrice();
+            double callPrice = row.getCallPrice();
+
+            blackScholesModel bModel(stockPrice, CSVstrikePrice, expiration, 6.50e-10, 2.38e-3, blackScholesModel::OptionType::CALL);
+            double estimatedPrice = bModel.calculateOptionPrice();
+            estimatedPrices.push_back(estimatedPrice);
+        }
+
+
+        // calculate the RMSE
+        std::vector<double> actualPrices;
+        for (const auto& row : data)
+        {
+            actualPrices.push_back(row.getCallPrice());
+        }
+        double rmse = rootMeanSquareError(estimatedPrices, actualPrices);
+        cout << "RMSE: " << rmse << endl;        
+    }
+
+
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed = end - start;
     cout << "Elapsed time: " << elapsed.count() << " seconds" << endl;
@@ -43,9 +92,7 @@ int main()
     return 0;
 }
 
-// TODO: Develop more edge case testing for optionGreeks, optionGreeksModel, and BlackScholesModel
-
-// TODO: In-depth review of base-case parameters for model creation
-
 // TODO: Relook at hestonModel::calculateOptionPrice
 //      * lambda functions may be unnecessary, look at using parent functions
+// TODO: implement lattice walks
+// TODO: implement Wierner process for higher R^n dimensionality
