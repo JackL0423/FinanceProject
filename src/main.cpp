@@ -53,11 +53,6 @@ int main()
     }
     else
     {
-        cout << "Data from CSV file:" << endl;
-        for (const auto& row : data)
-        {
-            row.print();
-        }
 
         // get data from CSV file and plug into models
         std::vector<double> estimatedPrices;
@@ -81,7 +76,28 @@ int main()
             actualPrices.push_back(row.getCallPrice());
         }
         double rmse = rootMeanSquareError(estimatedPrices, actualPrices);
-        cout << "RMSE: " << rmse << endl;        
+        cout << " Black-Scholes RMSE: " << rmse << endl;
+
+        std::vector<double> estimatedPricesHeston;
+        for (const auto& row : data)
+        {
+            double expiration = row.getExpiration();
+            double stockPrice = row.getStockPrice();
+            double CSVstrikePrice = row.getStrikePrice();
+            double callPrice = row.getCallPrice();
+
+            hestonModel hModel(stockPrice, CSVstrikePrice, expiration, 6.50e-10, 2.38e-3, sqrt(2.38e-3), 2.0, 5.16e-5, 0.2, 0.2, hestonModel::OptionType::CALL);
+            double estimatedPrice = hModel.calculateOptionPrice(true, 1000, 1000);
+            estimatedPricesHeston.push_back(estimatedPrice);
+        }
+
+        std::vector<double> actualPricesHeston;
+        for (const auto& row : data)
+        {
+            actualPricesHeston.push_back(row.getCallPrice());
+        }
+        double rmseHeston = rootMeanSquareError(estimatedPricesHeston, actualPricesHeston);
+        cout << " Heston RMSE: " << rmseHeston << endl;
     }
 
 
