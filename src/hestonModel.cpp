@@ -134,6 +134,10 @@ double hestonModel::calculateOptionPrice(bool useMonteCarlo, int num_simulations
     }
 }
 
+/// @brief 
+/// @param generator 
+/// @param num_time_steps 
+/// @return Vt
 double hestonModel::simulateVariance(std::mt19937& generator, int num_time_steps) const 
 {
     try
