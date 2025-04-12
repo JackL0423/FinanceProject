@@ -1,11 +1,12 @@
 #include "gtest/gtest.h"
+#include "../include/optionType.h"
 #include "../include/blackScholesModel.h"
 
 class blackScholesModelTest : public testing::Test
 {
 protected:
     blackScholesModelTest() {}
-    blackScholesModel a = blackScholesModel(16.2, 13.3, 18.0, 6.2, 4.5, blackScholesModel::OptionType::PUT);
+    blackScholesModel a = blackScholesModel(16.2, 13.3, 18.0, 6.2, 4.5, PUT);
     blackScholesModel b = blackScholesModel(5.6, 4.2, 45.3, 3.14, 2.71);
     blackScholesModel c = blackScholesModel();
 };
@@ -17,7 +18,7 @@ TEST_F(blackScholesModelTest, ConstructorValidInputs)
     EXPECT_EQ(a.getTimeToExperation(), 18.0);
     EXPECT_EQ(a.getRiskFreeRate(), 6.2);
     EXPECT_EQ(a.getVolatility(), 4.5);
-    EXPECT_EQ(a.getOptionType(), blackScholesModel::OptionType::PUT);
+    EXPECT_EQ(a.getOptionType(), PUT);
 }
 
 TEST_F(blackScholesModelTest, ConstructorDefaultOptionType)
@@ -27,7 +28,7 @@ TEST_F(blackScholesModelTest, ConstructorDefaultOptionType)
     EXPECT_EQ(b.getTimeToExperation(), 45.3);
     EXPECT_EQ(b.getRiskFreeRate(), 3.14);
     EXPECT_EQ(b.getVolatility(), 2.71);
-    EXPECT_EQ(b.getOptionType(), blackScholesModel::OptionType::CALL);
+    EXPECT_EQ(b.getOptionType(), CALL);
 }
 
 TEST_F(blackScholesModelTest, ConstructorDefaultValues)
@@ -37,7 +38,7 @@ TEST_F(blackScholesModelTest, ConstructorDefaultValues)
     EXPECT_TRUE(isnan(c.getTimeToExperation()));
     EXPECT_TRUE(isnan(c.getRiskFreeRate()));
     EXPECT_TRUE(isnan(c.getVolatility()));
-    EXPECT_EQ(c.getOptionType(), blackScholesModel::OptionType::CALL);
+    EXPECT_EQ(c.getOptionType(), CALL);
 }
 
 TEST_F(blackScholesModelTest, CalculateD1ValidInputs)
@@ -119,24 +120,24 @@ TEST_F(blackScholesModelTest, NormalCDFInvalidInput)
 
 TEST_F(blackScholesModelTest, EdgeCaseNegativeVolatility)
 {
-    blackScholesModel edge = blackScholesModel(16.2, 13.3, 18.0, 6.2, -4.5, blackScholesModel::OptionType::PUT);
+    blackScholesModel edge = blackScholesModel(16.2, 13.3, 18.0, 6.2, -4.5, PUT);
     EXPECT_TRUE(isnan(edge.getVolatility()));
 }
 
 TEST_F(blackScholesModelTest, EdgeCaseNegativeTimeToExpiration)
 {
-    blackScholesModel edge = blackScholesModel(16.2, 13.3, -18.0, 6.2, 4.5, blackScholesModel::OptionType::PUT);
+    blackScholesModel edge = blackScholesModel(16.2, 13.3, -18.0, 6.2, 4.5, PUT);
     EXPECT_TRUE(isnan(edge.getTimeToExperation()));
 }
 
 TEST_F(blackScholesModelTest, EdgeCaseZeroVolatility)
 {
-    blackScholesModel zeroVolatilityModel(16.2, 13.3, 18.0, 6.2, 0.0, blackScholesModel::OptionType::PUT);
+    blackScholesModel zeroVolatilityModel(16.2, 13.3, 18.0, 6.2, 0.0, PUT);
     EXPECT_NO_THROW(zeroVolatilityModel.calculateOptionPrice());
 }
 
 TEST_F(blackScholesModelTest, EdgeCaseZeroTimeToExpiration)
 {
-    blackScholesModel zeroTimeModel(16.2, 13.3, 0.0, 6.2, 4.5, blackScholesModel::OptionType::PUT);
+    blackScholesModel zeroTimeModel(16.2, 13.3, 0.0, 6.2, 4.5, PUT);
     EXPECT_NO_THROW(zeroTimeModel.calculateOptionPrice());
 }

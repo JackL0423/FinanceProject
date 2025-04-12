@@ -6,7 +6,7 @@
 class hestonModelTest : public testing::Test
 {
     protected:
-        hestonModelTest() : model1(), model2(100.0, 100.0, 1.0, 0.05, 0.2, 0.04, 2.0, 0.04, 0.3, -0.7, optionGreeksModel::OptionType::PUT), model3(model2)
+        hestonModelTest() : model1(), model2(100.0, 100.0, 1.0, 0.05, 0.2, 0.04, 2.0, 0.04, 0.3, -0.7, PUT), model3(model2)
         {
         }
 
@@ -22,7 +22,7 @@ TEST_F(hestonModelTest, DefaultConstructor)
     EXPECT_TRUE(isnan(model1.getTimeToExperation()));
     EXPECT_TRUE(isnan(model1.getRiskFreeRate()));
     EXPECT_TRUE(isnan(model1.getVolatility()));
-    EXPECT_EQ(model1.getOptionType(), blackScholesModel::OptionType::CALL);
+    EXPECT_EQ(model1.getOptionType(), CALL);
     EXPECT_TRUE(isnan(model1.getV0()));
     EXPECT_TRUE(isnan(model1.getKappa()));
     EXPECT_TRUE(isnan(model1.getTheta()));
@@ -86,50 +86,50 @@ TEST_F(hestonModelTest, CalculateOptionPrice)
 
 TEST_F(hestonModelTest, EdgeCaseZeroVolatility)
 {
-    hestonModel model(100.0, 100.0, 1.0, 0.05, 0.0, 0.04, 2.0, 0.04, 0.0, -0.7, optionGreeksModel::OptionType::CALL);
+    hestonModel model(100.0, 100.0, 1.0, 0.05, 0.0, 0.04, 2.0, 0.04, 0.0, -0.7, CALL);
     double optionPrice = model.calculateOptionPrice(true, 10000, 100);
     EXPECT_TRUE(isnan(optionPrice));
 }
 
 TEST_F(hestonModelTest, EdgeCaseHighVolatility)
 {
-    hestonModel model(100.0, 100.0, 1.0, 0.05, 1.0, 0.04, 2.0, 0.04, 1.0, -0.7, optionGreeksModel::OptionType::CALL);
+    hestonModel model(100.0, 100.0, 1.0, 0.05, 1.0, 0.04, 2.0, 0.04, 1.0, -0.7, CALL);
     double optionPrice = model.calculateOptionPrice(true, 10000, 100);
     EXPECT_NEAR(optionPrice, 50.0, 10.0); // Adjust the expected value and tolerance as needed
 }
 
 TEST_F(hestonModelTest, InvalidNegativeVolatility)
 {
-    hestonModel model(100.0, 100.0, 1.0, 0.05, -0.2, 0.04, 2.0, 0.04, 0.3, -0.7, optionGreeksModel::OptionType::CALL);
+    hestonModel model(100.0, 100.0, 1.0, 0.05, -0.2, 0.04, 2.0, 0.04, 0.3, -0.7, CALL);
     EXPECT_TRUE(isnan(model.calculateOptionPrice(true, 10000, 100)));
 }
 
 TEST_F(hestonModelTest, BoundaryConditionZeroTimeToExpiration)
 {
-    hestonModel model(100.0, 100.0, 0.0, 0.05, 0.2, 0.04, 2.0, 0.04, 0.3, -0.7, optionGreeksModel::OptionType::CALL);
+    hestonModel model(100.0, 100.0, 0.0, 0.05, 0.2, 0.04, 2.0, 0.04, 0.3, -0.7, CALL);
     double optionPrice = model.calculateOptionPrice(true, 10000, 100);
     EXPECT_TRUE(isnan(optionPrice));
 }
 
 TEST_F(hestonModelTest, BoundaryConditionLongTimeToExpiration)
 {
-    hestonModel model(100.0, 100.0, 10.0, 0.05, 0.2, 0.04, 2.0, 0.04, 0.3, -0.7, optionGreeksModel::OptionType::CALL);
+    hestonModel model(100.0, 100.0, 10.0, 0.05, 0.2, 0.04, 2.0, 0.04, 0.3, -0.7, CALL);
     double optionPrice = model.calculateOptionPrice(true, 10000, 100);
     EXPECT_NEAR(optionPrice, 50.0, 10.0); // Adjust the expected value and tolerance as needed
 }
 
 TEST_F(hestonModelTest, ValidInputs) {
-    hestonModel model(100.0, 100.0, 1.0, 0.05, 0.2, 0.04, 2.0, 0.04, 0.3, -0.7, blackScholesModel::OptionType::CALL);
+    hestonModel model(100.0, 100.0, 1.0, 0.05, 0.2, 0.04, 2.0, 0.04, 0.3, -0.7, CALL);
     EXPECT_NO_THROW(model.calculateOptionPrice(true, 10000, 100));
 }
 
 TEST_F(hestonModelTest, ZeroVolatility) {
-    hestonModel model(100.0, 100.0, 1.0, 0.05, 0.0, 0.04, 2.0, 0.04, 0.3, -0.7, blackScholesModel::OptionType::CALL);
+    hestonModel model(100.0, 100.0, 1.0, 0.05, 0.0, 0.04, 2.0, 0.04, 0.3, -0.7, CALL);
     EXPECT_NO_THROW(model.calculateOptionPrice(true, 10000, 100));
 }
 
 TEST_F(hestonModelTest, ExtremeCorrelation) {
-    hestonModel model(100.0, 100.0, 1.0, 0.05, 0.2, 0.04, 2.0, 0.04, 0.3, 1.0, blackScholesModel::OptionType::CALL);
+    hestonModel model(100.0, 100.0, 1.0, 0.05, 0.2, 0.04, 2.0, 0.04, 0.3, 1.0, CALL);
     EXPECT_NO_THROW(model.calculateOptionPrice(true, 10000, 100));
 }
 
