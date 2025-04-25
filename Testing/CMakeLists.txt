@@ -32,25 +32,28 @@ set(LIBRARIES
     hestonModel
 )
 
-set(TEST_LIBRARIES
-    test_blackScholesModel
-    test_optionGreeks
-    test_optionGreeksModel
-    test_HestonModel
-)
 
 # Add libraries
-foreach(LIB ${LIBRARIES})
-    add_library(${LIB} ../src/${LIB}.cpp)
-    target_compile_features(${LIB} PUBLIC cxx_std_23)
-    target_include_directories(${LIB} PUBLIC ../include)
-endforeach()
+add_library(blackScholesModel ../src/blackScholesModel.cpp)
+add_library(optionGreeks ../src/optionGreeks.cpp)
+add_library(optionGreeksModel ../src/optionGreeksModel.cpp)
+add_library(hestonModel ../src/hestonModel.cpp)
+add_library(RMSE ../src/RMSE.cpp)
+add_library(inputReader ../src/inputReader.cpp)
 
-# Add test libraries
-foreach(TEST_LIB ${TEST_LIBRARIES})
-    add_library(${TEST_LIB} ${TEST_LIB}.cpp)
-    target_compile_features(${TEST_LIB} PUBLIC cxx_std_23)
-endforeach()
+target_include_directories(blackScholesModel PUBLIC ../include)
+target_include_directories(optionGreeks PUBLIC ../include)
+target_include_directories(optionGreeksModel PUBLIC ../include)
+target_include_directories(hestonModel PUBLIC ../include)
+target_include_directories(RMSE PUBLIC ../include)
+target_include_directories(inputReader PUBLIC ../include)
+# Add test set cpp standard for compilation
+target_compile_features(blackScholesModel PUBLIC cxx_std_23)
+target_compile_features(optionGreeks PUBLIC cxx_std_23)
+target_compile_features(optionGreeksModel PUBLIC cxx_std_23)
+target_compile_features(hestonModel PUBLIC cxx_std_23)
+target_compile_features(RMSE PUBLIC cxx_std_23)
+target_compile_features(inputReader PUBLIC cxx_std_23)
 
 # Add the test executable
 add_executable(${PROJECT_NAME}
@@ -62,9 +65,13 @@ add_executable(${PROJECT_NAME}
 
 # Link libraries to the test executable
 target_link_libraries(${PROJECT_NAME}
-    GTest::gtest
-    ${LIBRARIES}
-    ${TEST_LIBRARIES}
+    blackScholesModel
+    optionGreeks
+    optionGreeksModel
+    hestonModel
+    RMSE 
+    inputReader
+    GTest::gtest_main
 )
 
 # Discover tests

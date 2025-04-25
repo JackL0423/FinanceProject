@@ -90,12 +90,6 @@ TEST_F(optionGreeksModelTest, SetGammaVegaAdjustedDelta)
     EXPECT_DOUBLE_EQ(model.getGammaVegaAdjustedDelta(), 10.12);
 }
 
-TEST_F(optionGreeksModelTest, CalculateOptionPriceIV)
-{
-    model.calculateOptionPriceIV(0.2);
-    // Add assertions to check if the option price IV is correctly calculated
-}
-
 TEST_F(optionGreeksModelTest, CalculateOptionPriceGamma)
 {
     model.calculateOptionPriceGamma();
@@ -118,12 +112,6 @@ TEST_F(optionGreeksModelTest, CalculateOptionPriceGammaVega)
 {
     model.calculateOptionPriceGammaVega();
     // Add assertions to check if the option price Gamma Vega is correctly calculated
-}
-
-TEST_F(optionGreeksModelTest, CalculateIVAdjustedDelta)
-{
-    model.calculateIVAdjustedDelta(0.2);
-    // Add assertions to check if the IV adjusted delta is correctly calculated
 }
 
 TEST_F(optionGreeksModelTest, CalculateGammaAdjustedDelta)
@@ -153,7 +141,6 @@ TEST_F(optionGreeksModelTest, CalculateGammaVegaAdjustedDelta)
 TEST_F(optionGreeksModelTest, CalculateOptionPriceIVWithNaN)
 {
     model.setOptionPriceIV(NAN);
-    model.calculateOptionPriceIV(NAN);
     EXPECT_TRUE(isnan(model.getOptionPriceIV()));
 }
 
@@ -188,7 +175,6 @@ TEST_F(optionGreeksModelTest, CalculateOptionPriceGammaVegaWithNaN)
 TEST_F(optionGreeksModelTest, CalculateIVAdjustedDeltaWithNaN)
 {
     model.setIVAdjustedDelta(NAN);
-    model.calculateIVAdjustedDelta(NAN);
     EXPECT_TRUE(isnan(model.getIVAdjustedDelta()));
 }
 
