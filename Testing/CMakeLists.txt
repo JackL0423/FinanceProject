@@ -21,6 +21,8 @@ find_package(GTest REQUIRED)
 # Enable testing
 enable_testing()
 
+#TODO: #16 Fix makefile generation for gtest
+
 set(LIBRARIES
     inputReader
     RMSE
