@@ -104,7 +104,8 @@ const double& optionGreeksModel::getThetaAdjustedDelta() const { return _thetaAd
 
 const double& optionGreeksModel::getGammaVegaAdjustedDelta() const { return _gammaVegaAdjustedDelta; }
 
-
+/// @brief Reverse of the blackScholesModel to find the implied volatility
+/// @return ImpliedVol
 double optionGreeksModel::calculateImpliedVolatility() const
 {
     try
@@ -113,7 +114,7 @@ double optionGreeksModel::calculateImpliedVolatility() const
         {
             throw std::invalid_argument("Invalid input: NaN value detected");
         }
-
+        // Derive implied volatility from Black-Scholes formula
         double d1 = getD1();
         double d2 = d1 - (getVolatility() * sqrt(getTimeToExperation()));
 
