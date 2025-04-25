@@ -44,7 +44,7 @@ TEST_F(blackScholesModelTest, ConstructorDefaultValues)
 
 TEST_F(blackScholesModelTest, CalculateD1ValidInputs)
 {
-    double expectedD1 = (log(16.2 / 13.3) + (6.2 + 0.5 * 4.5 * 4.5) * 18.0) / (4.5 * sqrt(18.0));
+    double expectedD1 = (log(16.2 / 13.3) + (6.2 + 0.5 * 0.45 * 0.45) * 18.0) / (0.45 * sqrt(18.0));
     EXPECT_NEAR(a.getD1(), expectedD1, 1e-6);
 }
 
@@ -55,7 +55,7 @@ TEST_F(blackScholesModelTest, CalculateD1InvalidInputs)
 
 TEST_F(blackScholesModelTest, CalculateD2ValidInputs)
 {
-    double expectedD2 = a.getD1() - 4.5 * sqrt(18.0);
+    double expectedD2 = a.getD1() - 0.45 * sqrt(18.0);
     EXPECT_NEAR(a.getD2(), expectedD2, 1e-6);
 }
 
