@@ -78,6 +78,23 @@ int main()
         double rmse = rootMeanSquareError(estimatedPrices, actualPrices);
         cout << " Black-Scholes RMSE: " << rmse << endl;
 
+        // OptionGreeksModel
+        std::vector<double> estimatedPricesGreeks;
+        for (const auto& row : data)
+        {
+            double expiration = row.getExpiration();
+            double stockPrice = row.getStockPrice();
+            double CSVstrikePrice = row.getStrikePrice();
+            double callPrice = row.getCallPrice();
+
+            optionGreeksModel gModel(stockPrice, CSVstrikePrice, expiration, 6.50e-10, 2.38e-3);
+            double estimatedOptionGreeksModelPrice = gModel.getOptionPriceIV();
+            estimatedPricesGreeks.push_back(estimatedOptionGreeksModelPrice);
+        }
+
+        double rmseGreeks = rootMeanSquareError(estimatedPricesGreeks, actualPrices);
+        cout << " OptionGreeksModel RMSE: " << rmseGreeks << endl;
+
         std::vector<double> estimatedPricesHeston;
         for (const auto& row : data)
         {
@@ -98,6 +115,8 @@ int main()
         }
         double rmseHeston = rootMeanSquareError(estimatedPricesHeston, actualPricesHeston);
         cout << " Heston RMSE: " << rmseHeston << endl;
+
+
     }
 
 
