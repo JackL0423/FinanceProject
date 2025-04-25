@@ -5,12 +5,12 @@
 
 optionGreeksModel::optionGreeksModel()
 {
-    calculateOptionPriceIV(0.0);
+    calculateOptionPriceIV();
     calculateOptionPriceGamma();
     calculateOptionPriceVega();
     calculateOptionPriceTheta();
     calculateOptionPriceGammaVega();
-    calculateIVAdjustedDelta(0.0);
+    calculateIVAdjustedDelta();
     calculateGammaAdjustedDelta();
     calculateVegaAdjustedDelta();
     calculateThetaAdjustedDelta();
@@ -22,12 +22,12 @@ optionGreeksModel::optionGreeksModel(double underlyingPrice, double strikePrice,
 {
     // TODO: #4 [enhancement] Initialize the optionGreeksModel with given parameters
     //  Get rid of the parameters volatility to use implied volatility
-    calculateOptionPriceIV(volatility);
+    calculateOptionPriceIV();
     calculateOptionPriceGamma();
     calculateOptionPriceVega();
     calculateOptionPriceTheta();
     calculateOptionPriceGammaVega();
-    calculateIVAdjustedDelta(volatility);
+    calculateIVAdjustedDelta();
     calculateGammaAdjustedDelta();
     calculateVegaAdjustedDelta();
     calculateThetaAdjustedDelta();
@@ -104,8 +104,8 @@ const double& optionGreeksModel::getThetaAdjustedDelta() const { return _thetaAd
 
 const double& optionGreeksModel::getGammaVegaAdjustedDelta() const { return _gammaVegaAdjustedDelta; }
 
-    
-void optionGreeksModel::calculateOptionPriceIV(const double& impliedVolatility) const
+
+double optionGreeksModel::calculateImpliedVolatility() const
 {
     try
     {
@@ -114,11 +114,35 @@ void optionGreeksModel::calculateOptionPriceIV(const double& impliedVolatility) 
             throw std::invalid_argument("Invalid input: NaN value detected");
         }
 
+        double d1 = getD1();
+        double d2 = d1 - (getVolatility() * sqrt(getTimeToExperation()));
+
+        double impliedVolatility = (getUnderlyingPrice() * normalCDF(d1) - getStrikePrice() * exp(-getRiskFreeRate() * getTimeToExperation()) * normalCDF(d2)) / getUnderlyingPrice();
+
+        return impliedVolatility;
+    }
+    catch (const std::exception& e)
+    {
+        ErrorHandler::logError("Error in calculateImpliedVolatility: " + std::string(e.what()));
+        return nan("");
+    }
+}
+
+
+void optionGreeksModel::calculateOptionPriceIV() const
+{
+    try
+    {
+        if (isnan(getD1()) || isnan(getUnderlyingPrice()) || isnan(getStrikePrice()) || isnan(getRiskFreeRate()) || isnan(getTimeToExperation()))
+        {
+            throw std::invalid_argument("Invalid input: NaN value detected");
+        }
+        double impliedVol = calculateImpliedVolatility();
         double delta = getIVAdjustedDelta();
 
-        calculateD1(impliedVolatility);
+        calculateD1(impliedVol);
         double d1 = getD1();
-        double d2 = d1 - (impliedVolatility * sqrt(getTimeToExperation()));
+        double d2 = d1 - (impliedVol * sqrt(getTimeToExperation()));
 
         double optionPriceIV = (delta * getUnderlyingPrice() * normalCDF(d1)) 
                                 - (getStrikePrice() * exp(-getRiskFreeRate() * getTimeToExperation()) * normalCDF(d2));
@@ -213,7 +237,7 @@ void optionGreeksModel::calculateOptionPriceGammaVega() const
     }
 }
 
-void optionGreeksModel::calculateIVAdjustedDelta(double impliedVolatility) const
+void optionGreeksModel::calculateIVAdjustedDelta() const
 {
     try
     {
@@ -221,7 +245,7 @@ void optionGreeksModel::calculateIVAdjustedDelta(double impliedVolatility) const
         {
             throw std::invalid_argument("Invalid input: NaN value detected");
         }
-
+        double impliedVol = calculateImpliedVolatility();
         double d1 = getD1();
         double ivAdjustedDelta = normalCDF(d1);
 

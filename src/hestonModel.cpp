@@ -14,7 +14,7 @@ hestonModel::hestonModel() : blackScholesModel()
     setSigma(nan(""));
     setRho(nan(""));
 }
-
+// TODO: Calculate volatility for the model
 hestonModel::hestonModel(double underlyingPrice, double strikePrice, double timeToExperation, double riskFreeRate, double volatility, double v0, double kappa, double theta, double sigma, double rho, OptionType optionType)
     : blackScholesModel(underlyingPrice, strikePrice, timeToExperation, riskFreeRate, volatility, optionType), _v0(v0), _kappa(kappa), _theta(theta), _sigma(sigma), _rho(rho)
 {

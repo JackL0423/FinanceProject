@@ -7,6 +7,7 @@ sqrt(sum(estimated price - actual price) ^ 2)/n)
 
 double rootMeanSquareError(const std::vector<double>& observed, const std::vector<double>& predicted)
 {
+    // Check if the vectors are the same size
     if (observed.size() != predicted.size())
     {
         throw std::invalid_argument("Vectors must be of the same size");
