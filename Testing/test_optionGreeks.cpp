@@ -8,7 +8,7 @@ class OptionGreeksTest : public testing::Test
         {    
         }
     
-    optionGreeks a = optionGreeks(16.2, 13.3, 18.0, 6.2, 4.5);
+    optionGreeks a = optionGreeks(16.2, 13.3, 18.0, 6.2, 0.45);
     optionGreeks b = optionGreeks();
 };
 
@@ -18,7 +18,7 @@ TEST_F(OptionGreeksTest, optionGreeksTest_constructor_Test1)
     EXPECT_EQ(a.getStrikePrice(), 13.3);
     EXPECT_EQ(a.getTimeToExperation(), 18.0);
     EXPECT_EQ(a.getRiskFreeRate(), 6.2);
-    EXPECT_EQ(a.getVolatility(), 4.5);
+    EXPECT_EQ(a.getVolatility(), 0.45);
 }
 
 TEST_F(OptionGreeksTest, optionGreeksTest_constructor_Test2)
