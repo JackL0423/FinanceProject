@@ -7,8 +7,8 @@ class blackScholesModelTest : public testing::Test
 {
 protected:
     blackScholesModelTest() {}
-    blackScholesModel a = blackScholesModel(16.2, 13.3, 18.0, 6.2, 4.5, PUT);
-    blackScholesModel b = blackScholesModel(5.6, 4.2, 45.3, 3.14, 2.71);
+    blackScholesModel a = blackScholesModel(16.2, 13.3, 18.0, 6.2, 0.45, PUT);
+    blackScholesModel b = blackScholesModel(5.6, 4.2, 45.3, 3.14, 0.27);
     blackScholesModel c = blackScholesModel();
 };
 
@@ -18,7 +18,7 @@ TEST_F(blackScholesModelTest, ConstructorValidInputs)
     EXPECT_EQ(a.getStrikePrice(), 13.3);
     EXPECT_EQ(a.getTimeToExperation(), 18.0);
     EXPECT_EQ(a.getRiskFreeRate(), 6.2);
-    EXPECT_EQ(a.getVolatility(), 4.5);
+    EXPECT_EQ(a.getVolatility(), 0.45);
     EXPECT_EQ(a.getOptionType(), PUT);
 }
 
@@ -28,7 +28,7 @@ TEST_F(blackScholesModelTest, ConstructorDefaultOptionType)
     EXPECT_EQ(b.getStrikePrice(), 4.2);
     EXPECT_EQ(b.getTimeToExperation(), 45.3);
     EXPECT_EQ(b.getRiskFreeRate(), 3.14);
-    EXPECT_EQ(b.getVolatility(), 2.71);
+    EXPECT_EQ(b.getVolatility(), 0.27);
     EXPECT_EQ(b.getOptionType(), CALL);
 }
 
@@ -127,7 +127,7 @@ TEST_F(blackScholesModelTest, EdgeCaseNegativeVolatility)
 
 TEST_F(blackScholesModelTest, EdgeCaseNegativeTimeToExpiration)
 {
-    blackScholesModel edge = blackScholesModel(16.2, 13.3, -18.0, 6.2, 4.5, PUT);
+    blackScholesModel edge = blackScholesModel(16.2, 13.3, -18.0, 6.2, 0.45, PUT);
     EXPECT_TRUE(isnan(edge.getTimeToExperation()));
 }
 
@@ -139,6 +139,6 @@ TEST_F(blackScholesModelTest, EdgeCaseZeroVolatility)
 
 TEST_F(blackScholesModelTest, EdgeCaseZeroTimeToExpiration)
 {
-    blackScholesModel zeroTimeModel(16.2, 13.3, 0.0, 6.2, 4.5, PUT);
+    blackScholesModel zeroTimeModel(16.2, 13.3, 0.0, 6.2, 0.45, PUT);
     EXPECT_NO_THROW(zeroTimeModel.calculateOptionPrice());
 }
