@@ -3,6 +3,10 @@
 #include <stdexcept>
 #include <iostream>
 
+/**
+ * @brief Default constructor for optionGreeksModel.
+ * Initializes and calculates all option price and delta adjustments.
+ */
 optionGreeksModel::optionGreeksModel()
 {
     calculateOptionPriceIV();
@@ -17,6 +21,16 @@ optionGreeksModel::optionGreeksModel()
     calculateGammaVegaAdjustedDelta();
 }
 
+/**
+ * @brief Parameterized constructor for optionGreeksModel.
+ * Initializes the model with given parameters and calculates all adjustments.
+ * 
+ * @param underlyingPrice The price of the underlying asset.
+ * @param strikePrice The strike price of the option.
+ * @param timeToExperation Time to expiration in years.
+ * @param riskFreeRate The risk-free interest rate.
+ * @param volatility The volatility of the underlying asset.
+ */
 optionGreeksModel::optionGreeksModel(double underlyingPrice, double strikePrice, double timeToExperation, double riskFreeRate, double volatility)
     : optionGreeks(underlyingPrice, strikePrice, timeToExperation, riskFreeRate, volatility), blackScholesModel(underlyingPrice, strikePrice, timeToExperation, riskFreeRate, volatility) 
 {
@@ -34,6 +48,10 @@ optionGreeksModel::optionGreeksModel(double underlyingPrice, double strikePrice,
     calculateGammaVegaAdjustedDelta();
 }
 
+/**
+ * @brief Sets the option price based on implied volatility.
+ * @param value The calculated option price IV.
+ */
 void optionGreeksModel::setOptionPriceIV(const double& value) const
 {
     _optionPriceIv = value;
