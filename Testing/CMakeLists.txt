@@ -9,31 +9,46 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Include GoogleTest
 include(FetchContent)
 FetchContent_Declare(
-    googletest
-    URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
+  googletest
+  URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
 )
+
 FetchContent_MakeAvailable(googletest)
+
+# Ensure GoogleTest targets are available
+find_package(GTest REQUIRED)
 
 # Enable testing
 enable_testing()
 
+set(LIBRARIES
+    inputReader
+    RMSE
+    blackScholesModel
+    optionGreeks
+    optionGreeksModel
+    hestonModel
+)
+
+set(TEST_LIBRARIES
+    test_blackScholesModel
+    test_optionGreeks
+    test_optionGreeksModel
+    test_HestonModel
+)
+
 # Add libraries
-add_library(ScholesModel ../src/blackScholesModel.cpp)
-add_library(optionGreeks ../src/optionGreeks.cpp)
-add_library(optionGreeksModel ../src/optionGreeksModel.cpp)
-add_library(hestonModel ../src/hestonModel.cpp)
+foreach(LIB ${LIBRARIES})
+    add_library(${LIB} ../src/${LIB}.cpp)
+    target_compile_features(${LIB} PUBLIC cxx_std_23)
+    target_include_directories(${LIB} PUBLIC ../include)
+endforeach()
 
-# Set include directories for libraries
-target_include_directories(ScholesModel PUBLIC ../include)
-target_include_directories(optionGreeks PUBLIC ../include)
-target_include_directories(optionGreeksModel PUBLIC ../include)
-target_include_directories(hestonModel PUBLIC ../include)
-
-# Set C++ standard for libraries
-target_compile_features(ScholesModel PUBLIC cxx_std_23)
-target_compile_features(optionGreeks PUBLIC cxx_std_23)
-target_compile_features(optionGreeksModel PUBLIC cxx_std_23)
-target_compile_features(hestonModel PUBLIC cxx_std_23)
+# Add test libraries
+foreach(TEST_LIB ${TEST_LIBRARIES})
+    add_library(${TEST_LIB} ${TEST_LIB}.cpp)
+    target_compile_features(${TEST_LIB} PUBLIC cxx_std_23)
+endforeach()
 
 # Add the test executable
 add_executable(${PROJECT_NAME}
@@ -45,14 +60,12 @@ add_executable(${PROJECT_NAME}
 
 # Link libraries to the test executable
 target_link_libraries(${PROJECT_NAME}
-    ScholesModel
-    optionGreeks
-    optionGreeksModel
-    hestonModel
-    GTest::gtest_main
+    GTest::gtest
+    ${LIBRARIES}
+    ${TEST_LIBRARIES}
 )
 
 # Discover tests
-include(GoogleTest)
+include(googleTest)
 gtest_discover_tests(${PROJECT_NAME})
 

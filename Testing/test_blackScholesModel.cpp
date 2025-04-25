@@ -1,4 +1,5 @@
 #include "gtest/gtest.h"
+#include "../include/ErrorHandler.h"
 #include "../include/optionType.h"
 #include "../include/blackScholesModel.h"
 
