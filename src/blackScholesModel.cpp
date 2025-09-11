@@ -5,7 +5,7 @@
 #include "../include/ErrorHandler.h"
 
 using namespace std;
-
+// Comment
 /// @brief calculates and sets the d1 value in the Black-Scholes model. 
 void blackScholesModel::calculateD1()
 {
