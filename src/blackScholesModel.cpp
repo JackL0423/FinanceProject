@@ -210,7 +210,7 @@ void blackScholesModel::setVolatility(const double& value)
     {
         if (value <= 0.0 || value >= 1.0)
         {
-            throw invalid_argument("Invalid input: Volatility must be greater than or equal to 0");
+            throw invalid_argument("Invalid input: Volatility must be between 0 and 1 (exclusive)");
         }
         _volatility = value;
     }
