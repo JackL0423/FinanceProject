@@ -37,7 +37,8 @@ TEST_F(OptionGreeksTest, optionGreeksTest_constructor_Test2)
 
 TEST_F(OptionGreeksTest, optionGreeksTest_calculateDelta_Test1)
 {
-    double ExpectedDelta = exp(-a.getD1() * a.getD1() / 2) / sqrt(2 * M_PI);
+    // Default option type is CALL; standard call delta = N(d1)
+    double ExpectedDelta = a.normalCDF(a.getD1());
     EXPECT_NEAR(a.getDelta(), ExpectedDelta, 1e-6);
 }
 
@@ -48,7 +49,8 @@ TEST_F(OptionGreeksTest, optionGreeksTest_calculateDelta_Test2)
 
 TEST_F(OptionGreeksTest, optionGreeksTest_calculateGamma_Test1)
 {
-    double ExpectedGamma = exp(-a.getD2() * a.getD1() / 2) / (sqrt(2 * M_PI) * a.getUnderlyingPrice() * a.getVolatility() * sqrt(a.getTimeToExperation()));
+    // Standard gamma = phi(d1) / (S * sigma * sqrt(T))
+    double ExpectedGamma = exp(-a.getD1() * a.getD1() / 2) / (sqrt(2 * M_PI) * a.getUnderlyingPrice() * a.getVolatility() * sqrt(a.getTimeToExperation()));
     EXPECT_NEAR(a.getGamma(), ExpectedGamma, 1e-6);
 }
 
@@ -59,7 +61,8 @@ TEST_F(OptionGreeksTest, optionGreeksTest_calculateGamma_Test2)
 
 TEST_F(OptionGreeksTest, optionGreeksTest_calculateVega_Test1)
 {
-    double ExpectedVega = a.getUnderlyingPrice() * exp(-a.getD1() * a.getD1() / 2) * sqrt(a.getTimeToExperation());
+    // Standard vega = S * phi(d1) * sqrt(T)
+    double ExpectedVega = a.getUnderlyingPrice() * exp(-a.getD1() * a.getD1() / 2) / sqrt(2 * M_PI) * sqrt(a.getTimeToExperation());
     EXPECT_NEAR(a.getVega(), ExpectedVega, 1e-6);
 }
 
@@ -70,7 +73,8 @@ TEST_F(OptionGreeksTest, optionGreeksTest_calculateVega_Test2)
 
 TEST_F(OptionGreeksTest, optionGreeksTest_calculateTheta_Test1)
 {
-    double ExpectedTheta = -a.getUnderlyingPrice() * exp(-a.getD1() * a.getD1() / 2) * a.getVolatility() / (2* sqrt(a.getTimeToExperation())) - a.getRiskFreeRate() * a.getK() * exp(-a.getRiskFreeRate() * a.getTimeToExperation()) * a.normalCDF(a.getD2());
+    // Standard theta = -S*phi(d1)*sigma/(2*sqrt(T)) - r*K*exp(-rT)*N(d2)
+    double ExpectedTheta = -a.getUnderlyingPrice() * exp(-a.getD1() * a.getD1() / 2) / sqrt(2 * M_PI) * a.getVolatility() / (2 * sqrt(a.getTimeToExperation())) - a.getRiskFreeRate() * a.getStrikePrice() * exp(-a.getRiskFreeRate() * a.getTimeToExperation()) * a.normalCDF(a.getD2());
     EXPECT_NEAR(a.getTheta(), ExpectedTheta, 1e-6);
 }
 
@@ -81,7 +85,8 @@ TEST_F(OptionGreeksTest, optionGreeksTest_calculateTheta_Test2)
 
 TEST_F(OptionGreeksTest, optionGreeksTest_calculateRho_Test1)
 {
-    double ExpectedRho = a.getK() * a.getTimeToExperation() * exp(-a.getRiskFreeRate() * a.getTimeToExperation()) * a.normalCDF(a.getD2());
+    // Standard rho = K_strike * T * exp(-rT) * N(d2)
+    double ExpectedRho = a.getStrikePrice() * a.getTimeToExperation() * exp(-a.getRiskFreeRate() * a.getTimeToExperation()) * a.normalCDF(a.getD2());
     EXPECT_NEAR(a.getRho(), ExpectedRho, 1e-6);
 }
 
