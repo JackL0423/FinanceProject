@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Options Pricing Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:       #0d1117;
+    --surface:  #161b22;
+    --border:   #30363d;
+    --text:     #e6edf3;
+    --muted:    #8b949e;
+    --accent:   #58a6ff;
+    --green:    #3fb950;
+    --red:      #f85149;
+    --yellow:   #d29922;
+    --radius:   8px;
+    --font:     'Inter', system-ui, sans-serif;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 14px;
+    min-height: 100vh;
+  }
+
+  /* ── Header ── */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 24px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  header h1 { font-size: 16px; font-weight: 600; letter-spacing: .03em; }
+  header h1 span { color: var(--accent); }
+  .ticker-bar { display: flex; gap: 8px; align-items: center; }
+  .ticker-bar input {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: var(--radius);
+    padding: 6px 12px;
+    font-size: 14px;
+    width: 100px;
+    text-transform: uppercase;
+  }
+  .ticker-bar input:focus { outline: none; border-color: var(--accent); }
+  .btn {
+    background: var(--accent);
+    color: #0d1117;
+    border: none;
+    border-radius: var(--radius);
+    padding: 6px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity .15s;
+  }
+  .btn:hover { opacity: .85; }
+  .btn.secondary {
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+  #status-badge {
+    font-size: 12px;
+    color: var(--muted);
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+  }
+  #status-badge.ok    { color: var(--green); border-color: var(--green); }
+  #status-badge.error { color: var(--red);   border-color: var(--red); }
+
+  /* ── Tabs ── */
+  nav.tabs {
+    display: flex;
+    gap: 2px;
+    padding: 0 24px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+  nav.tabs button {
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--muted);
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: color .15s, border-color .15s;
+  }
+  nav.tabs button:hover { color: var(--text); }
+  nav.tabs button.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* ── Main layout ── */
+  main { padding: 20px 24px; max-width: 1400px; margin: 0 auto; }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ── Grid helpers ── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+  @media (max-width: 900px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    .grid-5 { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  /* ── Cards ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+  }
+  .card h2 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    margin-bottom: 14px;
+  }
+
+  /* ── Form ── */
+  .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .form-group { display: flex; flex-direction: column; gap: 4px; }
+  .form-group label { font-size: 12px; color: var(--muted); }
+  .form-group input, .form-group select {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 13px;
+    width: 100%;
+  }
+  .form-group input:focus, .form-group select:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+  .form-full { grid-column: 1 / -1; }
+
+  /* ── Stat cards ── */
+  .stat { padding: 12px 16px; }
+  .stat .label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; }
+  .stat .value { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .stat .sub   { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .stat.positive .value { color: var(--green); }
+  .stat.negative .value { color: var(--red); }
+  .stat.accent   .value { color: var(--accent); }
+
+  /* ── Greeks row ── */
+  .greeks-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 16px; }
+  .greek-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px;
+    text-align: center;
+  }
+  .greek-card .name  { font-size: 11px; color: var(--muted); letter-spacing: .05em; }
+  .greek-card .val   { font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; margin-top: 4px; }
+
+  /* ── Table ── */
+  .table-wrap { overflow-x: auto; margin-top: 4px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th {
+    text-align: left;
+    padding: 8px 10px;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: var(--surface);
+  }
+  td { padding: 7px 10px; border-bottom: 1px solid #1c2128; font-variant-numeric: tabular-nums; }
+  tr:hover td { background: rgba(255,255,255,.03); }
+  .itm { background: rgba(63,185,80,.07); }
+  .itm:hover td { background: rgba(63,185,80,.12) !important; }
+  .badge {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .badge.itm { background: rgba(63,185,80,.2); color: var(--green); }
+  .badge.otm { background: rgba(139,148,158,.15); color: var(--muted); }
+
+  /* ── IV color scale ── */
+  .iv-cell { font-weight: 600; }
+
+  /* ── Heston sliders ── */
+  .sliders { display: flex; flex-direction: column; gap: 14px; }
+  .slider-row { display: flex; flex-direction: column; gap: 4px; }
+  .slider-header { display: flex; justify-content: space-between; }
+  .slider-header label { font-size: 12px; color: var(--muted); }
+  .slider-header .sval { font-size: 12px; font-weight: 600; color: var(--text); }
+  input[type=range] {
+    width: 100%;
+    accent-color: var(--accent);
+    cursor: pointer;
+  }
+
+  /* ── Chart containers ── */
+  .chart-wrap { position: relative; height: 260px; }
+
+  /* ── Loading / empty ── */
+  .empty {
+    text-align: center;
+    color: var(--muted);
+    padding: 40px 20px;
+    font-size: 13px;
+  }
+  .spinner {
+    display: inline-block;
+    width: 18px; height: 18px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Payoff chart ── */
+  .payoff-section { margin-top: 16px; }
+
+  /* ── Surface heatmap ── */
+  #surface-wrap { overflow-x: auto; }
+  #surface-table { border-collapse: collapse; font-size: 11px; }
+  #surface-table th, #surface-table td {
+    padding: 4px 6px;
+    border: 1px solid var(--border);
+    text-align: center;
+    min-width: 56px;
+  }
+  #surface-table th { color: var(--muted); background: var(--surface); }
+
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: #1c2128;
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 10px 16px;
+    border-radius: var(--radius);
+    font-size: 13px;
+    opacity: 0;
+    transition: opacity .3s;
+    z-index: 999;
+  }
+  .toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════ HEADER ════════════════════════════════ -->
+<header>
+  <h1>⚡ Options Pricing <span>Dashboard</span></h1>
+  <div class="ticker-bar">
+    <input id="global-ticker" type="text" value="SPY" maxlength="8" placeholder="Ticker" />
+    <button class="btn" onclick="loadAll()">Load</button>
+    <span id="status-badge">—</span>
+  </div>
+</header>
+
+<!-- ════════════════════════════════ TABS ════════════════════════════════ -->
+<nav class="tabs">
+  <button class="active" onclick="switchTab('pricer',this)">📊 Pricer</button>
+  <button onclick="switchTab('chain',this)">📋 Options Chain</button>
+  <button onclick="switchTab('heston',this)">🌀 Heston Model</button>
+  <button onclick="switchTab('surface',this)">🗺 IV Surface</button>
+</nav>
+
+<!-- ════════════════════════════════ MAIN ════════════════════════════════ -->
+<main>
+
+  <!-- ─── TAB 1: PRICER ─── -->
+  <div id="tab-pricer" class="tab-panel active">
+    <div class="grid-2">
+
+      <!-- INPUT FORM -->
+      <div class="card">
+        <h2>Black-Scholes Parameters</h2>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Spot Price (S)</label>
+            <input id="p-spot" type="number" value="100" step="1" />
+          </div>
+          <div class="form-group">
+            <label>Strike Price (K)</label>
+            <input id="p-strike" type="number" value="100" step="1" />
+          </div>
+          <div class="form-group">
+            <label>Time to Expiry (yrs)</label>
+            <input id="p-tte" type="number" value="1.0" step="0.05" min="0.01" />
+          </div>
+          <div class="form-group">
+            <label>Risk-Free Rate</label>
+            <input id="p-rfr" type="number" value="0.05" step="0.005" />
+          </div>
+          <div class="form-group">
+            <label>Volatility (σ)</label>
+            <input id="p-vol" type="number" value="0.20" step="0.01" min="0.001" max="0.999" />
+          </div>
+          <div class="form-group">
+            <label>Option Type</label>
+            <select id="p-type">
+              <option value="call">Call</option>
+              <option value="put">Put</option>
+            </select>
+          </div>
+          <div class="form-full">
+            <button class="btn" style="width:100%" onclick="runPricer()">Calculate</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PRICE OUTPUT -->
+      <div>
+        <div class="grid-3" style="margin-bottom:12px">
+          <div class="card stat accent">
+            <div class="label">Option Price</div>
+            <div class="value" id="out-price">—</div>
+            <div class="sub" id="out-model">Black-Scholes</div>
+          </div>
+          <div class="card stat">
+            <div class="label">d1</div>
+            <div class="value" id="out-d1">—</div>
+          </div>
+          <div class="card stat">
+            <div class="label">d2</div>
+            <div class="value" id="out-d2">—</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Greeks</h2>
+          <div class="greeks-row">
+            <div class="greek-card">
+              <div class="name">DELTA Δ</div>
+              <div class="val" id="g-delta">—</div>
+            </div>
+            <div class="greek-card">
+              <div class="name">GAMMA Γ</div>
+              <div class="val" id="g-gamma">—</div>
+            </div>
+            <div class="greek-card">
+              <div class="name">VEGA ν</div>
+              <div class="val" id="g-vega">—</div>
+            </div>
+            <div class="greek-card">
+              <div class="name">THETA Θ</div>
+              <div class="val" id="g-theta">—</div>
+            </div>
+            <div class="greek-card">
+              <div class="name">RHO ρ</div>
+              <div class="val" id="g-rho">—</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAYOFF CHART -->
+    <div class="card payoff-section">
+      <h2>Payoff at Expiry</h2>
+      <div class="chart-wrap">
+        <canvas id="payoff-chart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── TAB 2: OPTIONS CHAIN ─── -->
+  <div id="tab-chain" class="tab-panel">
+    <div class="card" style="margin-bottom:12px">
+      <div style="display:flex;gap:10px;align-items:flex-end">
+        <div class="form-group" style="width:100px">
+          <label>Ticker</label>
+          <input id="chain-ticker" type="text" value="SPY" />
+        </div>
+        <div class="form-group" style="width:90px">
+          <label>Type</label>
+          <select id="chain-type">
+            <option value="call">Calls</option>
+            <option value="put">Puts</option>
+          </select>
+        </div>
+        <button class="btn" onclick="loadChain()">Fetch Chain</button>
+        <span id="chain-meta" style="color:var(--muted);font-size:12px;align-self:center"></span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="table-wrap" style="max-height:520px;overflow-y:auto">
+        <table>
+          <thead>
+            <tr>
+              <th>Strike</th>
+              <th>Expiry</th>
+              <th>Bid</th>
+              <th>Ask</th>
+              <th>Last</th>
+              <th>Volume</th>
+              <th>OI</th>
+              <th>IV (calc)</th>
+              <th>Moneyness</th>
+            </tr>
+          </thead>
+          <tbody id="chain-body">
+            <tr><td colspan="9" class="empty">Enter a ticker and click Fetch Chain.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── TAB 3: HESTON ─── -->
+  <div id="tab-heston" class="tab-panel">
+    <div class="grid-2">
+
+      <!-- SLIDERS -->
+      <div class="card">
+        <h2>Heston Parameters</h2>
+        <div class="sliders">
+
+          <div class="slider-row">
+            <div class="slider-header">
+              <label>κ — Mean Reversion Speed</label>
+              <span class="sval" id="sv-kappa">2.00</span>
+            </div>
+            <input type="range" id="sl-kappa" min="0.1" max="10" step="0.1" value="2.0"
+                   oninput="document.getElementById('sv-kappa').textContent=parseFloat(this.value).toFixed(2)">
+          </div>
+
+          <div class="slider-row">
+            <div class="slider-header">
+              <label>θ — Long-Run Variance</label>
+              <span class="sval" id="sv-theta">0.04</span>
+            </div>
+            <input type="range" id="sl-theta" min="0.01" max="0.25" step="0.005" value="0.04"
+                   oninput="document.getElementById('sv-theta').textContent=parseFloat(this.value).toFixed(3)">
+          </div>
+
+          <div class="slider-row">
+            <div class="slider-header">
+              <label>σᵥ — Vol of Vol</label>
+              <span class="sval" id="sv-sigma">0.30</span>
+            </div>
+            <input type="range" id="sl-sigma" min="0.01" max="1.0" step="0.01" value="0.30"
+                   oninput="document.getElementById('sv-sigma').textContent=parseFloat(this.value).toFixed(2)">
+          </div>
+
+          <div class="slider-row">
+            <div class="slider-header">
+              <label>ρ — Spot-Vol Correlation</label>
+              <span class="sval" id="sv-rho">-0.70</span>
+            </div>
+            <input type="range" id="sl-rho" min="-0.99" max="0.99" step="0.01" value="-0.70"
+                   oninput="document.getElementById('sv-rho').textContent=parseFloat(this.value).toFixed(2)">
+          </div>
+
+          <div class="slider-row">
+            <div class="slider-header">
+              <label>v₀ — Initial Variance</label>
+              <span class="sval" id="sv-v0">0.04</span>
+            </div>
+            <input type="range" id="sl-v0" min="0.005" max="0.50" step="0.005" value="0.04"
+                   oninput="document.getElementById('sv-v0').textContent=parseFloat(this.value).toFixed(3)">
+          </div>
+
+        </div>
+
+        <div style="margin-top:20px;display:flex;gap:8px">
+          <button class="btn" style="flex:1" onclick="runHeston()">Price with Heston</button>
+          <input id="h-sims" type="number" value="5000" min="1000" max="100000" step="1000"
+                 style="width:100px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:6px 10px;font-size:13px" title="MC Simulations" />
+        </div>
+        <p style="color:var(--muted);font-size:11px;margin-top:6px">MC paths. More = slower but more accurate.</p>
+      </div>
+
+      <!-- COMPARISON OUTPUT -->
+      <div>
+        <div class="grid-2" style="margin-bottom:12px">
+          <div class="card stat accent">
+            <div class="label">Heston Price</div>
+            <div class="value" id="h-price">—</div>
+            <div class="sub">Monte Carlo</div>
+          </div>
+          <div class="card stat">
+            <div class="label">Black-Scholes Price</div>
+            <div class="value" id="h-bs-price">—</div>
+            <div class="sub">ATM vol = σ</div>
+          </div>
+        </div>
+        <div class="card">
+          <h2>Price Comparison</h2>
+          <div class="chart-wrap">
+            <canvas id="heston-chart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Heston uses pricer tab params for S, K, T, r, σ -->
+    <p style="color:var(--muted);font-size:12px;margin-top:12px">
+      Uses S / K / T / r / σ from the <strong style="color:var(--text)">Pricer</strong> tab.
+      Adjust those values there, then click Price with Heston here.
+    </p>
+  </div>
+
+  <!-- ─── TAB 4: IV SURFACE ─── -->
+  <div id="tab-surface" class="tab-panel">
+    <div class="card" style="margin-bottom:12px">
+      <div style="display:flex;gap:10px;align-items:flex-end">
+        <div class="form-group" style="width:100px">
+          <label>Ticker</label>
+          <input id="surf-ticker" type="text" value="SPY" />
+        </div>
+        <button class="btn" onclick="loadSurface()">Build Surface</button>
+        <span style="color:var(--muted);font-size:12px;align-self:center">
+          Fetches call chain across all available expiries.
+        </span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Implied Volatility Surface (Calls)</h2>
+      <div id="surface-loading" class="empty" style="display:none">
+        <span class="spinner"></span>Loading IV surface…
+      </div>
+      <div id="surface-wrap">
+        <div class="empty" id="surface-empty">Select a ticker and click Build Surface.</div>
+        <div id="surface-chart-wrap" style="display:none">
+          <div class="chart-wrap" style="height:320px">
+            <canvas id="surface-chart"></canvas>
+          </div>
+          <p style="color:var(--muted);font-size:11px;margin-top:8px;text-align:center">
+            IV vs. Strike colored by expiry. Hover for details.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<div id="toast" class="toast"></div>
+
+<!-- ════════════════════════════════ SCRIPTS ════════════════════════════════ -->
+<script>
+// ── Config ──────────────────────────────────────────────────────────────────
+const API = window.location.origin;   // same-origin: dashboard served by FastAPI
+let payoffChartInst = null;
+let hestonChartInst = null;
+let surfaceChartInst = null;
+
+// ── Utilities ───────────────────────────────────────────────────────────────
+function fmt(v, dec=4) {
+  if (v == null) return '—';
+  return typeof v === 'number' ? v.toFixed(dec) : v;
+}
+function fmtK(v) {
+  if (v == null) return '—';
+  if (v >= 1e6) return (v/1e6).toFixed(1)+'M';
+  if (v >= 1e3) return (v/1e3).toFixed(1)+'K';
+  return v.toString();
+}
+function ivColor(iv) {
+  if (iv == null) return '';
+  if (iv < 0.15) return 'color:#3fb950';
+  if (iv < 0.25) return 'color:#d29922';
+  if (iv < 0.40) return 'color:#f0883e';
+  return 'color:#f85149';
+}
+function toast(msg, isError=false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.borderColor = isError ? 'var(--red)' : 'var(--green)';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+function setStatus(ok, text) {
+  const el = document.getElementById('status-badge');
+  el.textContent = text;
+  el.className = ok ? 'ok' : 'error';
+}
+
+// ── Tab switching ────────────────────────────────────────────────────────────
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('nav.tabs button').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ── Global load (from header) ────────────────────────────────────────────────
+async function loadAll() {
+  const ticker = document.getElementById('global-ticker').value.trim().toUpperCase();
+  if (!ticker) return;
+  // Sync ticker fields
+  document.getElementById('chain-ticker').value = ticker;
+  document.getElementById('surf-ticker').value  = ticker;
+  // Fetch health
+  try {
+    const r = await fetch(`${API}/health`);
+    const d = await r.json();
+    setStatus(d.pricing_core_loaded, d.pricing_core_loaded ? '● core loaded' : '! core missing');
+  } catch { setStatus(false, '✖ API offline'); return; }
+  // Fetch spot to populate pricer
+  try {
+    const r = await fetch(`${API}/price/black-scholes`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        ticker,
+        strike_price: 1,  // dummy — we just want spot
+        time_to_expiration: 0.25,
+        volatility: 0.20,
+        option_type: 'call',
+      })
+    });
+    if (r.ok) {
+      const d = await r.json();
+      const spot = Math.round(d.spot_price);
+      document.getElementById('p-spot').value   = spot;
+      document.getElementById('p-strike').value = spot;
+      document.getElementById('p-rfr').value    = fmt(d.risk_free_rate, 4);
+      toast(`Loaded ${ticker} — spot $${d.spot_price.toFixed(2)}`);
+    }
+  } catch(e) { toast('Could not fetch spot: '+e.message, true); }
+}
+
+// ── Pricer ───────────────────────────────────────────────────────────────────
+async function runPricer() {
+  const S    = +document.getElementById('p-spot').value;
+  const K    = +document.getElementById('p-strike').value;
+  const T    = +document.getElementById('p-tte').value;
+  const r    = +document.getElementById('p-rfr').value;
+  const vol  = +document.getElementById('p-vol').value;
+  const type = document.getElementById('p-type').value;
+
+  // Price + Greeks in parallel
+  const [priceRes, greeksRes] = await Promise.all([
+    fetch(`${API}/price/black-scholes`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        spot_price:S, strike_price:K, time_to_expiration:T,
+        risk_free_rate:r, volatility:vol, option_type:type,
+      })
+    }),
+    fetch(`${API}/greeks`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        spot_price:S, strike_price:K, time_to_expiration:T,
+        risk_free_rate:r, volatility:vol, option_type:type,
+      })
+    }),
+  ]);
+
+  if (!priceRes.ok || !greeksRes.ok) {
+    const err = await (priceRes.ok ? greeksRes : priceRes).json();
+    toast((err.detail || 'API error'), true);
+    return;
+  }
+
+  const pd = await priceRes.json();
+  const gd = await greeksRes.json();
+
+  document.getElementById('out-price').textContent = fmt(pd.price, 4);
+  document.getElementById('out-d1').textContent    = fmt(pd.d1,    6);
+  document.getElementById('out-d2').textContent    = fmt(pd.d2,    6);
+  document.getElementById('g-delta').textContent   = fmt(gd.delta, 4);
+  document.getElementById('g-gamma').textContent   = fmt(gd.gamma, 6);
+  document.getElementById('g-vega').textContent    = fmt(gd.vega,  4);
+  document.getElementById('g-theta').textContent   = fmt(gd.theta, 4);
+  document.getElementById('g-rho').textContent     = fmt(gd.rho,   4);
+
+  // Color theta (negative) and delta
+  document.getElementById('g-theta').style.color = gd.theta < 0 ? 'var(--red)' : 'var(--green)';
+  document.getElementById('g-delta').style.color = 'var(--accent)';
+
+  drawPayoff(S, K, r, T, vol, type, pd.price);
+}
+
+function drawPayoff(S, K, r, T, vol, type, premium) {
+  const spots = [], payoff = [], pnl = [];
+  const lo = S * 0.7, hi = S * 1.3;
+  for (let s = lo; s <= hi; s += (hi - lo) / 100) {
+    spots.push(+s.toFixed(2));
+    let p = 0;
+    if (type === 'call')      p = Math.max(0, s - K);
+    else                      p = Math.max(0, K - s);
+    payoff.push(+p.toFixed(4));
+    pnl.push(+(p - premium).toFixed(4));
+  }
+
+  if (payoffChartInst) payoffChartInst.destroy();
+  payoffChartInst = new Chart(document.getElementById('payoff-chart').getContext('2d'), {
+    type: 'line',
+    data: {
+      labels: spots,
+      datasets: [
+        {
+          label: 'Payoff at Expiry',
+          data: payoff,
+          borderColor: '#58a6ff',
+          backgroundColor: 'rgba(88,166,255,0.08)',
+          borderWidth: 2,
+          pointRadius: 0,
+          fill: true,
+          tension: 0.1,
+        },
+        {
+          label: 'P&L (net of premium)',
+          data: pnl,
+          borderColor: '#3fb950',
+          backgroundColor: 'rgba(63,185,80,0.06)',
+          borderWidth: 2,
+          pointRadius: 0,
+          fill: true,
+          tension: 0.1,
+          borderDash: [4,3],
+        },
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 200 },
+      plugins: {
+        legend: { labels: { color: '#8b949e', font: { size: 12 } } },
+        tooltip: {
+          backgroundColor: '#161b22',
+          borderColor: '#30363d',
+          borderWidth: 1,
+          titleColor: '#e6edf3',
+          bodyColor: '#8b949e',
+          callbacks: {
+            label: ctx => ` ${ctx.dataset.label}: $${ctx.raw.toFixed(4)}`
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: { color: '#8b949e', maxTicksLimit: 10, callback: v => '$'+spots[v] },
+          grid:  { color: '#21262d' },
+        },
+        y: {
+          ticks: { color: '#8b949e', callback: v => '$'+v },
+          grid:  { color: '#21262d' },
+        }
+      }
+    }
+  });
+}
+
+// ── Options Chain ────────────────────────────────────────────────────────────
+async function loadChain() {
+  const ticker = document.getElementById('chain-ticker').value.trim().toUpperCase();
+  const type   = document.getElementById('chain-type').value;
+  const tbody  = document.getElementById('chain-body');
+  const meta   = document.getElementById('chain-meta');
+
+  tbody.innerHTML = `<tr><td colspan="9" class="empty"><span class="spinner"></span> Fetching chain…</td></tr>`;
+  meta.textContent = '';
+
+  let data;
+  try {
+    const r = await fetch(`${API}/chain/${ticker}?option_type=${type}`);
+    if (!r.ok) {
+      const e = await r.json();
+      throw new Error(e.detail || r.statusText);
+    }
+    data = await r.json();
+  } catch(e) {
+    tbody.innerHTML = `<tr><td colspan="9" class="empty" style="color:var(--red)">Error: ${e.message}</td></tr>`;
+    toast(e.message, true);
+    return;
+  }
+
+  if (!data.length) {
+    tbody.innerHTML = `<tr><td colspan="9" class="empty">No data returned.</td></tr>`;
+    return;
+  }
+
+  meta.textContent = `${data.length} strikes · expiry: ${data[0].expiry ?? '—'}`;
+
+  tbody.innerHTML = data.map(row => {
+    const itm = row.in_the_money;
+    const iv  = row.iv_calculated;
+    const ivStr = iv != null ? (iv*100).toFixed(1)+'%' : '—';
+    return `<tr class="${itm ? 'itm' : ''}">
+      <td>${fmt(row.strike,2)}</td>
+      <td style="color:var(--muted);font-size:12px">${row.expiry ?? '—'}</td>
+      <td>${fmt(row.bid,2)}</td>
+      <td>${fmt(row.ask,2)}</td>
+      <td>${fmt(row.last,2)}</td>
+      <td>${fmtK(row.volume)}</td>
+      <td>${fmtK(row.open_interest)}</td>
+      <td class="iv-cell" style="${ivColor(iv)}">${ivStr}</td>
+      <td><span class="badge ${itm?'itm':'otm'}">${itm?'ITM':'OTM'}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+// ── Heston ───────────────────────────────────────────────────────────────────
+async function runHeston() {
+  const S    = +document.getElementById('p-spot').value;
+  const K    = +document.getElementById('p-strike').value;
+  const T    = +document.getElementById('p-tte').value;
+  const r    = +document.getElementById('p-rfr').value;
+  const vol  = +document.getElementById('p-vol').value;
+  const kappa = +document.getElementById('sl-kappa').value;
+  const theta = +document.getElementById('sl-theta').value;
+  const sigma = +document.getElementById('sl-sigma').value;
+  const rho   = +document.getElementById('sl-rho').value;
+  const v0    = +document.getElementById('sl-v0').value;
+  const sims  = +document.getElementById('h-sims').value;
+
+  document.getElementById('h-price').textContent = '⏳';
+
+  const [hRes, bsRes] = await Promise.all([
+    fetch(`${API}/price/heston`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        spot_price:S, strike_price:K, time_to_expiration:T,
+        risk_free_rate:r, volatility:vol,
+        v0, kappa, theta, sigma, rho,
+        option_type:'call',
+        use_monte_carlo: true,
+        num_simulations: sims,
+        num_time_steps: 100,
+      })
+    }),
+    fetch(`${API}/price/black-scholes`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        spot_price:S, strike_price:K, time_to_expiration:T,
+        risk_free_rate:r, volatility:vol, option_type:'call',
+      })
+    }),
+  ]);
+
+  const hd = await hRes.json();
+  const bd = await bsRes.json();
+
+  const hp = hd.price ?? null;
+  const bp = bd.price ?? null;
+
+  document.getElementById('h-price').textContent    = hp != null ? `$${hp.toFixed(4)}` : '—';
+  document.getElementById('h-bs-price').textContent = bp != null ? `$${bp.toFixed(4)}` : '—';
+
+  // Bar chart comparison
+  if (hestonChartInst) hestonChartInst.destroy();
+  hestonChartInst = new Chart(document.getElementById('heston-chart').getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: ['Black-Scholes', 'Heston (MC)'],
+      datasets: [{
+        data: [bp, hp],
+        backgroundColor: ['rgba(88,166,255,0.6)', 'rgba(63,185,80,0.6)'],
+        borderColor:     ['#58a6ff', '#3fb950'],
+        borderWidth: 2,
+        borderRadius: 6,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 300 },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#161b22',
+          borderColor: '#30363d',
+          borderWidth: 1,
+          titleColor: '#e6edf3',
+          bodyColor: '#8b949e',
+          callbacks: { label: ctx => ` $${ctx.raw.toFixed(4)}` }
+        }
+      },
+      scales: {
+        x: { ticks: { color: '#8b949e' }, grid: { color: '#21262d' } },
+        y: {
+          ticks: { color: '#8b949e', callback: v => '$'+v.toFixed(2) },
+          grid:  { color: '#21262d' },
+        }
+      }
+    }
+  });
+}
+
+// ── IV Surface ───────────────────────────────────────────────────────────────
+async function loadSurface() {
+  const ticker = document.getElementById('surf-ticker').value.trim().toUpperCase();
+  document.getElementById('surface-empty').style.display      = 'none';
+  document.getElementById('surface-chart-wrap').style.display = 'none';
+  document.getElementById('surface-loading').style.display    = 'block';
+
+  // Fetch chain for near-term expiry (default)
+  let data;
+  try {
+    const r = await fetch(`${API}/chain/${ticker}?option_type=call`);
+    if (!r.ok) throw new Error((await r.json()).detail || r.statusText);
+    data = await r.json();
+  } catch(e) {
+    document.getElementById('surface-loading').style.display = 'none';
+    document.getElementById('surface-empty').style.display   = 'block';
+    document.getElementById('surface-empty').textContent = 'Error: ' + e.message;
+    toast(e.message, true);
+    return;
+  }
+
+  document.getElementById('surface-loading').style.display = 'none';
+
+  // Filter to rows with valid IV and TTE
+  const valid = data.filter(r => r.iv_calculated != null && r.time_to_expiry > 0);
+  if (!valid.length) {
+    document.getElementById('surface-empty').style.display = 'block';
+    document.getElementById('surface-empty').textContent = 'No IV data available for surface.';
+    return;
+  }
+
+  // Build scatter dataset: x=strike, y=IV, colored by TTE bucket
+  const tteBuckets = [...new Set(valid.map(r => r.time_to_expiry.toFixed(3)))].sort();
+  const colors = ['#58a6ff','#3fb950','#d29922','#f85149','#bc8cff','#f0883e'];
+
+  const datasets = tteBuckets.slice(0, colors.length).map((tte, i) => {
+    const rows = valid.filter(r => r.time_to_expiry.toFixed(3) === tte);
+    const days = Math.round(+tte * 365);
+    return {
+      label: `${days}d`,
+      data: rows.map(r => ({ x: r.strike, y: +(r.iv_calculated * 100).toFixed(2) })),
+      backgroundColor: colors[i] + '99',
+      borderColor: colors[i],
+      pointRadius: 5,
+      pointHoverRadius: 8,
+    };
+  });
+
+  document.getElementById('surface-chart-wrap').style.display = 'block';
+  if (surfaceChartInst) surfaceChartInst.destroy();
+  surfaceChartInst = new Chart(document.getElementById('surface-chart').getContext('2d'), {
+    type: 'scatter',
+    data: { datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 300 },
+      plugins: {
+        legend: {
+          labels: { color: '#8b949e', font: { size: 11 }, padding: 14 }
+        },
+        tooltip: {
+          backgroundColor: '#161b22',
+          borderColor: '#30363d',
+          borderWidth: 1,
+          titleColor: '#e6edf3',
+          bodyColor: '#8b949e',
+          callbacks: {
+            label: ctx => ` Strike $${ctx.raw.x.toFixed(0)}  IV ${ctx.raw.y.toFixed(1)}%`
+          }
+        }
+      },
+      scales: {
+        x: {
+          title: { display: true, text: 'Strike', color: '#8b949e' },
+          ticks: { color: '#8b949e', callback: v => '$'+v },
+          grid:  { color: '#21262d' },
+        },
+        y: {
+          title: { display: true, text: 'Implied Volatility (%)', color: '#8b949e' },
+          ticks: { color: '#8b949e', callback: v => v+'%' },
+          grid:  { color: '#21262d' },
+        }
+      }
+    }
+  });
+}
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+(async () => {
+  try {
+    const r = await fetch(`${API}/health`);
+    const d = await r.json();
+    setStatus(d.pricing_core_loaded, d.pricing_core_loaded ? '● core loaded' : '! core missing');
+  } catch {
+    setStatus(false, '✖ API offline');
+  }
+})();
+</script>
+</body>
+</html>

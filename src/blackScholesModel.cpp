@@ -112,7 +112,7 @@ blackScholesModel::blackScholesModel()
     setTimeToExperation(nan(""));
     setRiskFreeRate(nan(""));
     setVolatility(nan(""));
-    //setOptionType(OptionType::CALL);
+    setOptionType(OptionType::CALL);
     calculateD1();
     calculateD2();
     calculateK();
@@ -133,7 +133,7 @@ blackScholesModel::blackScholesModel(double underlyingPrice, double strikePrice,
     setTimeToExperation(timeToExperation);
     setRiskFreeRate(riskFreeRate);
     setVolatility(volatility);
-    //setOptionType(OptionType::CALL);
+    setOptionType(OptionType::CALL);
 
     calculateD1();
     calculateD2();
